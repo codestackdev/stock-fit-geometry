@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CodeStack.Community.StockFit.Base.Math.Structures
 {
-    public struct TransformationMaxtrix
+    public class TransformationMaxtrix
     {
         public RotationMatrix Rotation { get; set; }
         public Vector Translation { get; set; }

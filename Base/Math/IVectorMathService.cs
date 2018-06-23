@@ -14,5 +14,7 @@ namespace CodeStack.Community.StockFit.Base.Math
 
         TransformationMaxtrix GetTransformBetweenVectorsAroundPoint(
             Vector firstVector, Vector secondVector, Point point);
+
+        TransformationMaxtrix InverseTransformationMatrix(TransformationMaxtrix transform);
     }
 }

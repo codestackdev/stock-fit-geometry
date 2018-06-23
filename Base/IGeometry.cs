@@ -6,8 +6,8 @@ using System.Text;
 
 namespace CodeStack.Community.StockFit.Base
 {
-    public interface IStockFitExtractor<TParams>
+    public interface IGeometry
     {
-        TParams GetStockParameters(IGeometry geom, Vector heightDirection);
+        void GetExtremePoints(Vector dir, out Point startPt, out Point endPt);
     }
 }

@@ -5,17 +5,24 @@ using System.Text;
 
 namespace CodeStack.Community.StockFit.Base.Math.Structures
 {
-    public struct Vector
+    public class Vector : Point
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
-
-        public Vector(double x, double y, double z)
+        public Vector(double x, double y, double z) : base(x, y, z)
         {
-            X = x;
-            Y = y;
-            Z = z;
+        }
+
+        public Vector(double[] dir) : base(dir)
+        {
+        }
+
+        public bool IsSame(Vector vec)
+        {
+            if (vec == null)
+            {
+                throw new ArgumentNullException(nameof(vec));
+            }
+
+            return IsSame(vec.X, vec.Y, vec.Z);
         }
     }
 }
