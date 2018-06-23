@@ -38,6 +38,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CodeStack.Community.DevTools.Sw.Testing">
+      <HintPath>thirdpty\CodeStack.Community.DevTools.Sw.Testing.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MSTest.TestFramework.1.3.2\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
       <Private>True</Private>
@@ -66,14 +69,29 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="StockToolsTest.cs" />
-    <Compile Include="Framework\AppStartTools.cs" />
-    <Compile Include="Framework\SwUnitTestService.cs" />
-    <Compile Include="Framework\SwUnitTestParameters.cs" />
+    <Compile Include="RoundStockToolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwUnitTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\t1.SLDPRT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\t2.SLDPRT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\t3.SLDPRT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\t4.SLDPRT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\t5.SLDPRT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\t6.SLDPRT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

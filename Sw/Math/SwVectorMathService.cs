@@ -20,7 +20,8 @@ namespace CodeStack.Community.StockFit.Sw.Math
         public Vector TransformVector(Vector vector, TransformationMaxtrix transform)
         {
             IMathVector vec = m_MathUtils.CreateVector(vector.ToArray()) as IMathVector;
-            vec = vec.MultiplyTransform(transform) as IMathVector;
+            var swTransform = m_MathUtils.CreateTransFormTransformationMaxtrix(transform);
+            vec = vec.MultiplyTransform(swTransform) as IMathVector;
             return new Vector(vec.ArrayData as double[]);
         }
 
@@ -28,7 +29,7 @@ namespace CodeStack.Community.StockFit.Sw.Math
         {
             IMathPoint mathPt = m_MathUtils.CreatePoint(point.ToArray()) as IMathPoint;
             var swTransform = m_MathUtils.CreateTransFormTransformationMaxtrix(transform);
-            mathPt = mathPt.MultiplyTransform(transform) as IMathPoint;
+            mathPt = mathPt.MultiplyTransform(swTransform) as IMathPoint;
             return new Point(mathPt.ArrayData as double[]);
         }
 

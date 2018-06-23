@@ -1,6 +1,7 @@
-﻿using CodeStack.Community.Testing.Sw;
+﻿using CodeStack.Community.DevTools.Sw.Testing;
+using CodeStack.Community.DevTools.Sw.Testing.Parameters;
+using CodeStack.Community.StockFit.Sw;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sw.Tests.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,21 +13,25 @@ namespace Sw.Tests
     [TestClass]
     public class SwUnitTest
     {
-        protected SwUnitTestService Sw { get; private set; }
+        protected TestService Sw { get; private set; }
+
+        protected RoundStockTool m_StockTool;
 
         [TestInitialize]
         public void OnInitialize()
         {
-            var prms = new SwUnitTestParameters()
+            var prms = new TestServiceStartupParameters()
             {
-                LoadOption = SwLoadOption_e.ConnectToProcess,
-                OptionDetails = new ConnectToProcessOptionDetails()
+                ConnectOption = AppConnectOption_e.ConnectToProcess,
+                ConnectionDetails = new ConnectToProcessConnectionDetails()
                 {
                     ProcessToConnect = 11076
                 }
             };
 
-            Sw = new SwUnitTestService(prms);
+            Sw = new TestService(prms);
+
+            m_StockTool = new ServicesContainer(Sw.SldWorks).GetStockTool();
         }
 
         [TestCleanup]

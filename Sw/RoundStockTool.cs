@@ -9,16 +9,33 @@ using System.Text;
 
 namespace CodeStack.Community.StockFit.Sw
 {
-    internal class StockTools
+    public interface IStockTool
+    {
+    }
+
+    public class RoundStockTool : IStockTool
     {
         private ISldWorks m_App;
+        private CylindricalStockFitExtractor m_CylExt;
 
-        internal StockTools(ISldWorks app)
+        public RoundStockTool(ISldWorks app, CylindricalStockFitExtractor cylExt)
         {
             m_App = app;
+            m_CylExt = cylExt;
         }
 
-        internal void CreateCylindricalBody(IPartDoc part, CylinderParams cylParams)
+        internal IBody2 CreateCylindricalStock(IPartDoc part, object inputObj)
+        {
+            var body = GetBodyToProcess(part, inputObj);
+
+            var dir = GetDirection(inputObj);
+
+            var cylParams = m_CylExt.GetStockParameters(new SolidBodyGeometry(body), dir);
+
+            return CreateCylindricalBody(part, cylParams);
+        }
+
+        private IBody2 CreateCylindricalBody(IPartDoc part, CylinderParams cylParams)
         {
             var cylTempBody = m_App.IGetModeler().CreateBodyFromCyl(new double[]
                     {
@@ -27,13 +44,7 @@ namespace CodeStack.Community.StockFit.Sw
                         cylParams.Radius, cylParams.Height
                     }) as IBody2;
 
-            IFeature feat = part.CreateFeatureFromBody3(cylTempBody, false,
-                (int)swCreateFeatureBodyOpts_e.swCreateFeatureBodySimplify) as IFeature;
-
-            IBody2 body = feat.GetBody() as IBody2;
-
-            body.MaterialPropertyValues2 = new double[] { 1, 1, 0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
-
+            return cylTempBody;
         }
 
         internal IBody2 GetBodyToProcess(IPartDoc part, object inputObj)
@@ -55,7 +66,7 @@ namespace CodeStack.Community.StockFit.Sw
             throw new NullReferenceException("Failed to find the input body. Either select cylindrical face or use single body part");
         }
 
-        internal Vector GetDirection(IModelDoc2 model, object inputObj)
+        internal Vector GetDirection(object inputObj)
         {
             if (inputObj is IFace2)
             {
