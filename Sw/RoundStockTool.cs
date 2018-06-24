@@ -9,11 +9,13 @@ using System.Text;
 
 namespace CodeStack.Community.StockFit.Sw
 {
-    public interface IStockTool
+    public interface ISwRoundStockTool
     {
+        IBody2 CreateCylindricalStock(IPartDoc part, object inputObj);
+        IBody2 GetScopeBody(IPartDoc part, object inputObj);
     }
 
-    public class RoundStockTool : IStockTool
+    public class RoundStockTool : ISwRoundStockTool
     {
         private ISldWorks m_App;
         private CylindricalStockFitExtractor m_CylExt;
@@ -24,9 +26,9 @@ namespace CodeStack.Community.StockFit.Sw
             m_CylExt = cylExt;
         }
 
-        internal IBody2 CreateCylindricalStock(IPartDoc part, object inputObj)
+        public IBody2 CreateCylindricalStock(IPartDoc part, object inputObj)
         {
-            var body = GetBodyToProcess(part, inputObj);
+            var body = GetScopeBody(part, inputObj);
 
             var dir = GetDirection(inputObj);
 
@@ -47,7 +49,7 @@ namespace CodeStack.Community.StockFit.Sw
             return cylTempBody;
         }
 
-        internal IBody2 GetBodyToProcess(IPartDoc part, object inputObj)
+        public IBody2 GetScopeBody(IPartDoc part, object inputObj)
         {
             if (inputObj is IFace2)
             {
@@ -66,7 +68,7 @@ namespace CodeStack.Community.StockFit.Sw
             throw new NullReferenceException("Failed to find the input body. Either select cylindrical face or use single body part");
         }
 
-        internal Vector GetDirection(object inputObj)
+        private Vector GetDirection(object inputObj)
         {
             if (inputObj is IFace2)
             {

@@ -75,14 +75,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\ModelDocExtension.cs" />
     <Compile Include="Math\SwVectorMathService.cs" />
     <Compile Include="Math\MathUtilityEx.cs" />
+    <Compile Include="Pmp\Attributes\PmpControlTypeAttribute.cs" />
+    <Compile Include="Pmp\StockFeaturePageController.cs" />
+    <Compile Include="Pmp\StockFeaturePagePmpHandler.cs" />
+    <Compile Include="Pmp\StockFeaturePage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\EnumDisplayNameAttribute.cs" />
     <Compile Include="Reflection\EnumExtension.cs" />
+    <Compile Include="RoundStockFeatureParameters.cs" />
     <Compile Include="ServicesContainer.cs" />
     <Compile Include="SolidBodyGeometry.cs" />
     <Compile Include="RoundStockTool.cs" />
+    <Compile Include="StockMacroFeatureService.cs" />
     <Compile Include="SwStockFirGeometryAddIn.cs" />
   </ItemGroup>
   <ItemGroup>

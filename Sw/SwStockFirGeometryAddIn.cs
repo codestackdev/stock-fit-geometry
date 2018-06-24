@@ -1,4 +1,5 @@
-﻿using CodeStack.Community.StockFit.Sw.Reflection;
+﻿using CodeStack.Community.StockFit.Sw.Pmp;
+using CodeStack.Community.StockFit.Sw.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -55,6 +56,8 @@ namespace CodeStack.Community.StockFit.Sw
         private ISldWorks m_App;
         private int m_AddInId;
         private ICommandManager m_CmdMgr;
+
+        private ServicesContainer m_Container;
 
         #region SolidWorks Registration
 
@@ -115,6 +118,8 @@ namespace CodeStack.Community.StockFit.Sw
         public bool ConnectToSW(object ThisSW, int cookie)
         {
             m_App = ThisSW as ISldWorks;
+            m_Container = new ServicesContainer(m_App);
+
             m_AddInId = cookie;
 
             m_App.SetAddinCallbackInfo(0, this, m_AddInId);
@@ -205,10 +210,27 @@ namespace CodeStack.Community.StockFit.Sw
 
         public void OnCommandClick(int cmd)
         {
+            switch ((Commands_e)cmd)
+            {
+                case Commands_e.CreateStockFeature:
+                    var ctrl = m_Container.GetService<StockFeaturePageController>();
+                    ctrl.Process(m_App.IActiveDoc2 as IPartDoc);
+                    break;
+            }
         }
 
         public int OnCommandEnable(int cmd)
         {
+            switch ((Commands_e)cmd)
+            {
+                case Commands_e.CreateStockFeature:
+                    if (!(m_App.IActiveDoc2 is IPartDoc))
+                    {
+                        return (int)CommandItemEnableState_e.DeselectDisable;
+                    }
+                    break;
+            }
+
             return (int)CommandItemEnableState_e.DeselectEnable;
         }
 
