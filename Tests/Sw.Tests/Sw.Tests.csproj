@@ -69,9 +69,12 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="DoubleEqualityComparerWithTolerance.cs" />
     <Compile Include="RoundStockToolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SolidBodyGeometryTest.cs" />
     <Compile Include="SwUnitTest.cs" />
+    <Compile Include="SwVectorMathServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\t1.SLDPRT">
@@ -95,6 +98,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Base\Base.csproj">
+      <Project>{645e8753-1d07-48de-80c3-3764a54fe6a6}</Project>
+      <Name>Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Sw\Sw.csproj">
       <Project>{bf046003-0d5b-4930-9dce-b6eee9727340}</Project>
       <Name>Sw</Name>

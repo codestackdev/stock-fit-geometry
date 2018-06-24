@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CodeStack.Community.StockFit.Base.Math.Structures;
 using CodeStack.Community.StockFit.Base.Math;
+using System.Diagnostics;
 
 namespace CodeStack.Community.StockFit.Stocks.Cylinder
 {
@@ -54,6 +55,8 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
             Point rootPt;
             var height = GetHeight(geom, yAxis, alignTransform, out dir, out rootPt);
 
+            Debug.Assert(height != 0);
+
             var perPoints = GetPerimeterPoints(geom, alignTransform).ConvertAll(p => new Nayuki.Point(p.X, p.Z));
             
             var enclosingCirc = Nayuki.SmallestEnclosingCircle.MakeCircle(perPoints);
@@ -80,6 +83,7 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
             var vectors = new Vector[]
             {
                 m_DefaultVectors[VectorType_e.X],
+                m_DefaultVectors[VectorType_e.Y],
                 m_DefaultVectors[VectorType_e.Z]
             };
 
@@ -88,13 +92,15 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
                 Point startPt;
                 Point endPt;
 
-                geom.GetExtremePoints(vec, out startPt, out endPt);
+                GetExtremePointsAligned(geom, vec, alignTransform, out startPt, out endPt);
 
-                if (alignTransform != null)
-                {
-                    startPt = m_VecMathServ.TransformPoint(startPt, alignTransform);
-                    endPt = m_VecMathServ.TransformPoint(endPt, alignTransform);
-                }
+                //geom.GetExtremePoints(vec, out startPt, out endPt);
+
+                //if (alignTransform != null)
+                //{
+                //    startPt = m_VecMathServ.TransformPoint(startPt, alignTransform);
+                //    endPt = m_VecMathServ.TransformPoint(endPt, alignTransform);
+                //}
 
                 perPoints.Add(startPt);
                 perPoints.Add(endPt);
@@ -107,6 +113,24 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
             out Vector newDir, out Point rootPt)
         {
             Point endPt;
+            dir = GetExtremePointsAligned(geom, dir, alignTransform, out rootPt, out endPt);
+
+            double height = Math.Abs(endPt.Y - rootPt.Y);
+
+            //direction might change depending on root point so recalculating the direction to be towards geometry
+            newDir = new Vector(0, endPt.Y - rootPt.Y, 0);
+
+            return height;
+        }
+
+        private Vector GetExtremePointsAligned(IGeometry geom, Vector dir,
+            TransformationMaxtrix alignTransform, out Point rootPt, out Point endPt)
+        {
+            if (alignTransform != null)
+            {
+                dir = m_VecMathServ.TransformVector(dir, alignTransform);
+            }
+
             geom.GetExtremePoints(dir, out rootPt, out endPt);
 
             if (alignTransform != null)
@@ -115,12 +139,7 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
                 endPt = m_VecMathServ.TransformPoint(endPt, alignTransform);
             }
 
-            double height = Math.Abs(endPt.Y - rootPt.Y);
-
-            //direction might change depending on root point so recalculating the direction to be towards geometry
-            newDir = new Vector(0, endPt.Y - rootPt.Y, 0);
-
-            return height;
+            return dir;
         }
     }
 }

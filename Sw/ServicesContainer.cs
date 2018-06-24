@@ -32,5 +32,10 @@ namespace CodeStack.Community.StockFit.Sw
         {
             return m_Container.Resolve<IStockTool>() as RoundStockTool;
         }
+
+        internal TService GetService<TService>()
+        {
+            return m_Container.Resolve<TService>();
+        }
     }
 }

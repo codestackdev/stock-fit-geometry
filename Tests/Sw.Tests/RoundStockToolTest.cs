@@ -21,7 +21,7 @@ namespace Sw.Tests
             var body = Sw.App.WithDocument<IBody2>("Data\\t1.sldprt", 
                 m => 
                 {
-                    var input = Sw.Doc.GetEntity<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
+                    var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
                     var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
@@ -34,7 +34,7 @@ namespace Sw.Tests
             var body = Sw.App.WithDocument<IBody2>("Data\\t2.sldprt",
                 m =>
                 {
-                    var input = Sw.Doc.GetEntity<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
+                    var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
                     var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
@@ -47,7 +47,7 @@ namespace Sw.Tests
             var body = Sw.App.WithDocument<IBody2>("Data\\t3.sldprt",
                 m =>
                 {
-                    var input = Sw.Doc.GetEntity<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
+                    var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
                     var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
@@ -60,7 +60,7 @@ namespace Sw.Tests
             var body = Sw.App.WithDocument<IBody2>("Data\\t4.sldprt",
                 m =>
                 {
-                    var input = Sw.Doc.GetEntity<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
+                    var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
                     var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
@@ -74,7 +74,7 @@ namespace Sw.Tests
             var body = Sw.App.WithDocument<IBody2>("Data\\t5.sldprt",
                 m =>
                 {
-                    var input = Sw.Doc.GetEntity<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
+                    var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
                     var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
@@ -87,7 +87,7 @@ namespace Sw.Tests
             var body = Sw.App.WithDocument<IBody2>("Data\\t6.sldprt",
                 m =>
                 {
-                    var input = Sw.Doc.GetEntity<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
+                    var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
                     var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;

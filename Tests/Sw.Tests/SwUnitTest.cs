@@ -25,7 +25,7 @@ namespace Sw.Tests
                 ConnectOption = AppConnectOption_e.ConnectToProcess,
                 ConnectionDetails = new ConnectToProcessConnectionDetails()
                 {
-                    ProcessToConnect = 11076
+                    ProcessToConnect = 10640
                 }
             };
 
