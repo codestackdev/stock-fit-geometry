@@ -1,4 +1,10 @@
-﻿using CodeStack.Community.StockFit.Stocks.Cylinder;
+﻿//**********************
+//Stock Fit Geometry
+//Copyright(C) 2018 www.codestack.net
+//License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
+//**********************
+
+using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw.Pmp;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;

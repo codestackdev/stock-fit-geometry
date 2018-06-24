@@ -1,4 +1,10 @@
-﻿using CodeStack.Community.StockFit.Base.Math.Structures;
+﻿//**********************
+//Stock Fit Geometry
+//Copyright(C) 2018 www.codestack.net
+//License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
+//**********************
+
+using CodeStack.Community.StockFit.Base.Math.Structures;
 using SolidWorks.Interop.sldworks;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,10 @@
-﻿using System;
+﻿//**********************
+//Stock Fit Geometry
+//Copyright(C) 2018 www.codestack.net
+//License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
+//**********************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,11 +16,6 @@ namespace System
         public static TAtt GetAttribute<TAtt>(this Enum enumer)
             where TAtt : Attribute
         {
-            //if (!typeof(TEnum).IsEnum)
-            //{
-            //    throw new ArgumentException($"{typeof(TEnum)} must be an enumerated type");
-            //}
-
             var enumType = enumer.GetType();
             var enumField = enumType.GetMember(enumer.ToString()).FirstOrDefault();
             var atts = enumField.GetCustomAttributes(typeof(TAtt), false);

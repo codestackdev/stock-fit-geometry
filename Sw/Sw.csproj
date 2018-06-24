@@ -93,7 +93,7 @@
     <Compile Include="SolidBodyGeometry.cs" />
     <Compile Include="RoundStockTool.cs" />
     <Compile Include="StockMacroFeatureService.cs" />
-    <Compile Include="SwStockFirGeometryAddIn.cs" />
+    <Compile Include="SwStockFitGeometryAddIn.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Base\Base.csproj">

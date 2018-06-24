@@ -1,4 +1,10 @@
-﻿using CodeStack.Community.StockFit.Base;
+﻿//**********************
+//Stock Fit Geometry
+//Copyright(C) 2018 www.codestack.net
+//License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
+//**********************
+
+using CodeStack.Community.StockFit.Base;
 using CodeStack.Community.StockFit.Base.Math;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw.Math;
@@ -18,6 +24,9 @@ using Unity.Resolution;
 
 namespace CodeStack.Community.StockFit.Sw
 {
+    /// <summary>
+    /// Dependency injection and services container
+    /// </summary>
     public class ServicesContainer
     {
         private UnityContainer m_Container;

@@ -1,4 +1,10 @@
-﻿using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
+﻿//**********************
+//Stock Fit Geometry
+//Copyright(C) 2018 www.codestack.net
+//License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
+//**********************
+
+using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
 using CodeStack.Community.StockFit.Sw.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -14,8 +20,20 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 {
     public interface IStockFeaturePage : IDisposable
     {
+        /// <summary>
+        /// Raises when parameter is changed and preview needs to be updated
+        /// </summary>
         event Action<RoundStockFeatureParameters> ParametersChanged;
+
+        /// <summary>
+        /// Raises when page is closed
+        /// </summary>
+        /// <remarks>Generate feature in the event handler</remarks>
         event Action<bool, RoundStockFeatureParameters> Closed;
+
+        /// <summary>
+        /// Raises when page is about to be closed
+        /// </summary>
         event Action<bool, RoundStockFeatureParameters> Closing;
 
         void Show(RoundStockFeatureParameters parameters, IModelDoc2 model);
