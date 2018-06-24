@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 namespace CodeStack.Community.StockFit.Sw
 {
@@ -118,7 +119,23 @@ namespace CodeStack.Community.StockFit.Sw
         public bool ConnectToSW(object ThisSW, int cookie)
         {
             m_App = ThisSW as ISldWorks;
-            m_Container = new ServicesContainer(m_App);
+
+            var msg = @"This is a preview version of this software developed by www.codestack.net.
+Final version will be released in the near future and available for the download at https://www.codestack.net/labs/solidworks/stock-fit-geometry and this message will be removed.
+By using this software you agree on Terms and Conditions: https://www.codestack.net/terms-of-use.
+Source code is available at https://github.com/codestack-net-dev/stock-fit-geometry and redistributed under the GNU v3.0 license: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE.
+Continue?";
+
+            if (MessageBox.Show(msg, "Stock Fit Geometry", 
+                MessageBoxButtons.YesNo, MessageBoxIcon.Information) != DialogResult.Yes)
+            {
+                return false;
+            }
+
+            //TODO: load from settings
+            var setts = new RoundStockFeatureSettings();
+                        
+            m_Container = new ServicesContainer(m_App, setts);
 
             m_AddInId = cookie;
 
@@ -149,21 +166,21 @@ namespace CodeStack.Community.StockFit.Sw
 
             return true;
         }
-        
+
         private void AddCommandMgr()
-        {                        
+        {
             var title = CommandsGroups_e.Main.GetAttribute<DisplayNameAttribute>().DisplayName;
             var toolTip = CommandsGroups_e.Main.GetAttribute<DescriptionAttribute>().Description;
-            
+
             int cmdGroupErr = 0;
             bool ignorePrevious = false;
 
             object registryIDs;
-            
+
             bool getDataResult = m_CmdMgr.GetGroupDataFromRegistry((int)CommandsGroups_e.Main, out registryIDs);
 
             var knownIDs = (Enum.GetValues(typeof(Commands_e)) as Commands_e[]).Select(e => (int)e).ToArray();
-            
+
             if (getDataResult)
             {
                 if (!CompareIDs((int[])registryIDs, knownIDs)) //if the IDs don't match, reset the commandGroup
@@ -177,10 +194,10 @@ namespace CodeStack.Community.StockFit.Sw
 
             var bmpHelper = new BitmapHandler();
 
-            cmdGroup.LargeIconList = GetIcon(bmpHelper, "ToolbarLarge.bmp");
-            cmdGroup.SmallIconList = GetIcon(bmpHelper, "ToolbarSmall.bmp");
-            cmdGroup.LargeMainIcon = GetIcon(bmpHelper, "MainIconLarge.bmp");
-            cmdGroup.SmallMainIcon = GetIcon(bmpHelper, "MainIconSmall.bmp");
+            cmdGroup.LargeIconList = bmpHelper.GetIcon("ToolbarLarge.bmp");
+            cmdGroup.SmallIconList = bmpHelper.GetIcon("ToolbarSmall.bmp");
+            cmdGroup.LargeMainIcon = bmpHelper.GetIcon("MainIconLarge.bmp");
+            cmdGroup.SmallMainIcon = bmpHelper.GetIcon("MainIconSmall.bmp");
             
             foreach (Enum cmd in Enum.GetValues(typeof(Commands_e)))
             {
@@ -197,15 +214,8 @@ namespace CodeStack.Community.StockFit.Sw
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
             cmdGroup.Activate();
-            
+
             bmpHelper.Dispose();
-        }
-
-        private string GetIcon(BitmapHandler bmp, string name)
-        {
-            var assm = Assembly.GetAssembly(this.GetType());
-
-            return bmp.CreateFileFromResourceBitmap($"{this.GetType().Namespace}.Icons.{name}", assm);
         }
 
         public void OnCommandClick(int cmd)

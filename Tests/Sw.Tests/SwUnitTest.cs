@@ -31,7 +31,7 @@ namespace Sw.Tests
 
             Sw = new TestService(prms);
 
-            m_StockTool = new ServicesContainer(Sw.SldWorks).GetStockTool();
+            m_StockTool = new ServicesContainer(Sw.SldWorks, new RoundStockFeatureSettings()).GetStockTool();
         }
 
         [TestCleanup]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SolidWorks.Interop.swconst;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -23,6 +24,13 @@ namespace SolidWorks.Interop.sldworks
             {
                 return true;
             }
+        }
+
+        public static void SetPropertyValue(this IModelDoc2 model, string prpName, string prpVal, string conf = "")
+        {
+            var prpMgr = model.Extension.CustomPropertyManager[conf];
+            prpMgr.Add2(prpName, (int)swCustomInfoType_e.swCustomInfoText, prpVal);
+            prpMgr.Set2(prpName, prpVal);
         }
     }
 }

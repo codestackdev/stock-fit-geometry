@@ -76,6 +76,34 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
             return new CylinderParams(height, circCenter, dir, radius);
         }
 
+        public CylinderParams FitToStockSizeByStep(CylinderParams cylParams, double step)
+        {
+            if (step > 0)
+            {
+                var radStep = step / 2;
+                cylParams.Radius = Math.Ceiling(cylParams.Radius / radStep) * radStep;
+            }
+
+            return cylParams;
+        }
+
+        public CylinderParams ReCenter(Vector heightDirection, Point point, CylinderParams parameters)
+        {
+            var newOrigin = m_VecMathServ.ProjectPointOnVector(
+                point, heightDirection, parameters.Origin);
+
+            parameters.Radius += GetDistance(parameters.Origin, newOrigin);
+
+            parameters.Origin = newOrigin;
+
+            return parameters;
+        }
+
+        private double GetDistance(Point pt1, Point pt2)
+        {
+            return Math.Sqrt(Math.Pow(pt1.X - pt2.X, 2) + Math.Pow(pt1.Y - pt2.Y, 2) + Math.Pow(pt1.Z - pt2.Z, 2));
+        }
+
         private List<Point> GetPerimeterPoints(IGeometry geom, TransformationMaxtrix alignTransform)
         {
             var perPoints = new List<Point>();
@@ -94,13 +122,6 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
 
                 GetExtremePointsAligned(geom, vec, alignTransform, out startPt, out endPt);
 
-                //geom.GetExtremePoints(vec, out startPt, out endPt);
-
-                //if (alignTransform != null)
-                //{
-                //    startPt = m_VecMathServ.TransformPoint(startPt, alignTransform);
-                //    endPt = m_VecMathServ.TransformPoint(endPt, alignTransform);
-                //}
 
                 perPoints.Add(startPt);
                 perPoints.Add(endPt);

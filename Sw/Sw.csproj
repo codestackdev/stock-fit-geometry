@@ -52,6 +52,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\BitmapHandlerExtension.cs" />
     <Compile Include="Extension\ModelDocExtension.cs" />
     <Compile Include="Math\SwVectorMathService.cs" />
     <Compile Include="Math\MathUtilityEx.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Reflection\EnumDisplayNameAttribute.cs" />
     <Compile Include="Reflection\EnumExtension.cs" />
     <Compile Include="RoundStockFeatureParameters.cs" />
+    <Compile Include="RoundStockFeatureSettings.cs" />
     <Compile Include="ServicesContainer.cs" />
     <Compile Include="SolidBodyGeometry.cs" />
     <Compile Include="RoundStockTool.cs" />
@@ -110,6 +113,11 @@
     <EmbeddedResource Include="Icons\MainIconSmall.bmp" />
     <EmbeddedResource Include="Icons\ToolbarLarge.bmp" />
     <EmbeddedResource Include="Icons\ToolbarSmall.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\FeatureIcon.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

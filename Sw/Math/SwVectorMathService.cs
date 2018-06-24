@@ -59,5 +59,19 @@ namespace CodeStack.Community.StockFit.Sw.Math
             swTransform = swTransform.IInverse();
             return swTransform.ToTransformationMaxtrix();
         }
+
+        public Point ProjectPointOnVector(Point pt, Vector vec, Point pointOnVec)
+        {
+            var mathPt = m_MathUtils.CreatePoint(pt.ToArray()) as IMathPoint;
+            var mathVec = m_MathUtils.CreateVector(vec.ToArray()) as IMathVector;
+            var mathPointOnVec = m_MathUtils.CreatePoint(pointOnVec.ToArray()) as IMathPoint;
+
+            var mathVec2 = mathPointOnVec.Subtract(mathPt);
+
+            var newPt = mathPt.AddVector(
+                mathVec.Scale(mathVec.Dot(mathVec2) / mathVec.Dot(mathVec)) as IMathVector) as IMathPoint;
+
+            return new Point(newPt.ArrayData as double[]);
+        }
     }
 }

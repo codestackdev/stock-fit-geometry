@@ -1,5 +1,6 @@
 ﻿using CodeStack.Community.DevTools.Sw.Testing.Services;
 using CodeStack.Community.DevTools.Sw.Testing.TempDisplay;
+using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw;
 using CodeStack.Community.StockFit.Sw.Math;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +23,7 @@ namespace Sw.Tests
                 m => 
                 {
                     var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
-                    var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
+                    var tempBody = CreateCylindricalStock(m, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
                 });
@@ -35,7 +36,7 @@ namespace Sw.Tests
                 m =>
                 {
                     var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
-                    var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
+                    var tempBody = CreateCylindricalStock(m, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
                 });
@@ -48,7 +49,7 @@ namespace Sw.Tests
                 m =>
                 {
                     var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
-                    var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
+                    var tempBody = CreateCylindricalStock(m, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
                 });
@@ -61,7 +62,7 @@ namespace Sw.Tests
                 m =>
                 {
                     var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
-                    var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
+                    var tempBody = CreateCylindricalStock(m, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
                 });
@@ -75,7 +76,7 @@ namespace Sw.Tests
                 m =>
                 {
                     var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
-                    var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
+                    var tempBody = CreateCylindricalStock(m, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
                 });
@@ -88,10 +89,20 @@ namespace Sw.Tests
                 m =>
                 {
                     var input = Sw.Doc.GetEntityByName<IFace>(m as IPartDoc, "INPUT", EntityType_e.swSelFACES);
-                    var tempBody = m_StockTool.CreateCylindricalStock(m as IPartDoc, input);
+                    var tempBody = CreateCylindricalStock(m, input);
                     Sw.Doc.TempDisplayBody(tempBody, m, new SyncFormDisposeToken());
                     return tempBody;
                 });
+        }
+
+        private IBody2 CreateCylindricalStock(IModelDoc2 model, object inputObj,
+            bool concentric = false)
+        {
+            CylinderParams cylParams;
+            var tempBody = m_StockTool.CreateCylindricalStock(model as IPartDoc, 
+                inputObj, concentric, 0, out cylParams);
+
+            return tempBody;
         }
     }
 }

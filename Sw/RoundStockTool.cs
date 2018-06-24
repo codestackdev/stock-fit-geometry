@@ -11,7 +11,8 @@ namespace CodeStack.Community.StockFit.Sw
 {
     public interface ISwRoundStockTool
     {
-        IBody2 CreateCylindricalStock(IPartDoc part, object inputObj);
+        IBody2 CreateCylindricalStock(IPartDoc part, object inputObj,
+            bool concentric, double step, out CylinderParams cylParams);
         IBody2 GetScopeBody(IPartDoc part, object inputObj);
     }
 
@@ -26,13 +27,26 @@ namespace CodeStack.Community.StockFit.Sw
             m_CylExt = cylExt;
         }
 
-        public IBody2 CreateCylindricalStock(IPartDoc part, object inputObj)
+        public IBody2 CreateCylindricalStock(IPartDoc part, object inputObj, 
+            bool concentric, double step, out CylinderParams cylParams)
         {
             var body = GetScopeBody(part, inputObj);
 
             var dir = GetDirection(inputObj);
+            
+            cylParams = m_CylExt.GetStockParameters(new SolidBodyGeometry(body), dir);
 
-            var cylParams = m_CylExt.GetStockParameters(new SolidBodyGeometry(body), dir);
+            if (concentric && (inputObj is IFace2) && (inputObj as IFace2).IGetSurface().IsCylinder())
+            {
+                var surfCylParams = (inputObj as IFace2).IGetSurface().CylinderParams as double[];
+                var pt = new Point(surfCylParams[0], surfCylParams[1], surfCylParams[2]);
+                cylParams = m_CylExt.ReCenter(dir, pt, cylParams);
+            }
+
+            if (step > 0)
+            {
+                cylParams = m_CylExt.FitToStockSizeByStep(cylParams, step);
+            }
 
             return CreateCylindricalBody(part, cylParams);
         }

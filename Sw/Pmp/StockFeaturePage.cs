@@ -6,6 +6,7 @@ using SolidWorks.Interop.swpublished;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -33,6 +34,16 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
             [Description("Select cylindrical face or plane feature to specify the direction")]
             DirectionSelection,
 
+            [PmpControlType(swPropertyManagerPageControlType_e.swControlType_Combobox)]
+            [EnumDisplayName("Stock Step")]
+            [Description("Specifies the stock step")]
+            StockStep,
+
+            [PmpControlType(swPropertyManagerPageControlType_e.swControlType_Checkbox)]
+            [EnumDisplayName("Concentric")]
+            [Description("Specifies if the stock should be concentric with selected cylindrical face")]
+            Concentric,
+
             [PmpControlType(swPropertyManagerPageControlType_e.swControlType_Checkbox)]
             [EnumDisplayName("Create solid body")]
             [Description("Specifies if solid body should be created")]
@@ -50,10 +61,13 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
         private RoundStockFeatureParameters m_CurParameters;
         private IModelDoc2 m_CurModel;
 
-        public StockFeaturePage(ISldWorks app, ISwRoundStockTool stockTool)
+        private RoundStockFeatureSettings m_Setts;
+
+        public StockFeaturePage(ISldWorks app, ISwRoundStockTool stockTool, RoundStockFeatureSettings setts)
         {
             m_App = app;
             m_StockTool = stockTool;
+            m_Setts = setts;
 
             m_Handler = new StockFeaturePagePmpHandler();
             m_Handler.Closing += OnClosing;
@@ -67,6 +81,16 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
             int errors = -1;
             m_Page = m_App.CreatePropertyManagerPage("Stock", 
                 (int)options, m_Handler, ref errors) as IPropertyManagerPage2;
+
+            m_Page.SetMessage3("Select cylindrical face or plane to generate the round stock",
+                (int)swPropertyManagerPageMessageVisibility.swMessageBoxVisible,
+                (int)swPropertyManagerPageMessageExpanded.swMessageBoxExpand, "Stock Feature");
+
+            string icon = Path.Combine(Path.GetDirectoryName(
+                        typeof(SwStockFirGeometryAddIn).Assembly.Location),
+                        "Icons\\FeatureIcon.bmp");
+
+            m_Page.SetTitleBitmap2(icon);
 
             AddControls();
         }
@@ -93,8 +117,18 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
                 case Controls_e.CreateSolidBody:
                     m_CurParameters.CreateSolidBody = (m_Controls[ctrlEnumId] as IPropertyManagerPageCheckbox).Checked;
                     break;
-            }
 
+                case Controls_e.Concentric:
+                    m_CurParameters.ConcenticWithCylindricalFace = (m_Controls[ctrlEnumId] as IPropertyManagerPageCheckbox).Checked;
+                    raiseChangeEvent = true;
+                    break;
+
+                case Controls_e.StockStep:
+                    m_CurParameters.StockStep = m_Setts.StockSteps.ElementAt((m_Controls[ctrlEnumId] as IPropertyManagerPageCombobox).CurrentSelection).Key;
+                    raiseChangeEvent = true;
+                    break;
+            }
+            
             if (raiseChangeEvent)
             {
                 ParametersChanged?.Invoke(m_CurParameters);
@@ -136,6 +170,13 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
             var filter = new int[] { (int)swSelectType_e.swSelFACES, (int)swSelectType_e.swSelDATUMPLANES };
             selBox.Height = 20;
             selBox.SetSelectionFilters(filter);
+
+            m_Controls[Controls_e.StockStep].SetStandardPictureLabel(
+                (int)swControlBitmapLabelType_e.swBitmapLabel_LinearDistance);
+
+            var comboBox = m_Controls[Controls_e.StockStep] as IPropertyManagerPageCombobox;
+
+            comboBox.AddItems(m_Setts.StockSteps.Select(s => s.Key).ToArray());
         }
 
         public void Show(RoundStockFeatureParameters parameters, IModelDoc2 model)
@@ -146,6 +187,8 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
             m_CurModel = model;
             
             (m_Controls[Controls_e.CreateSolidBody] as IPropertyManagerPageCheckbox).Checked = parameters.CreateSolidBody;
+            (m_Controls[Controls_e.Concentric] as IPropertyManagerPageCheckbox).Checked = parameters.ConcenticWithCylindricalFace;
+            (m_Controls[Controls_e.StockStep] as IPropertyManagerPageCombobox).CurrentSelection = (short)m_Setts.StockSteps.Keys.ToList().IndexOf(parameters.StockStep);
 
             if (parameters.Direction != null)
             {

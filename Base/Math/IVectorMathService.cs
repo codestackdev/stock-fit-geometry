@@ -16,5 +16,7 @@ namespace CodeStack.Community.StockFit.Base.Math
             Vector firstVector, Vector secondVector, Point point);
 
         TransformationMaxtrix InverseTransformationMatrix(TransformationMaxtrix transform);
+
+        Point ProjectPointOnVector(Point pt, Vector vec, Point pointOnVec);
     }
 }

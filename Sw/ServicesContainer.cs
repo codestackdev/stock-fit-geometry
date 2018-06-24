@@ -28,7 +28,7 @@ namespace CodeStack.Community.StockFit.Sw
             private set;
         }
 
-        public ServicesContainer(ISldWorks app)
+        public ServicesContainer(ISldWorks app, RoundStockFeatureSettings setts)
         {
             Instance = this;
 
@@ -39,6 +39,8 @@ namespace CodeStack.Community.StockFit.Sw
 
             m_Container.RegisterInstance(app);
             m_Container.RegisterInstance(app.IGetMathUtility() as IMathUtility);
+
+            m_Container.RegisterInstance(setts);
 
             m_Container.RegisterType<IStockFitExtractor<CylinderParams>, CylindricalStockFitExtractor>(
                 new ContainerControlledLifetimeManager());

@@ -102,6 +102,10 @@
       <Project>{645e8753-1d07-48de-80c3-3764a54fe6a6}</Project>
       <Name>Base</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Stocks.Cylinder\Stocks.Cylinder.csproj">
+      <Project>{2F798E86-4306-4F93-8588-7E3A26542B1B}</Project>
+      <Name>Stocks.Cylinder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Sw\Sw.csproj">
       <Project>{bf046003-0d5b-4930-9dce-b6eee9727340}</Project>
       <Name>Sw</Name>

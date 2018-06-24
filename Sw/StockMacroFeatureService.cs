@@ -1,4 +1,5 @@
-﻿using CodeStack.Community.StockFit.Sw.Pmp;
+﻿using CodeStack.Community.StockFit.Stocks.Cylinder;
+using CodeStack.Community.StockFit.Sw.Pmp;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -52,19 +53,43 @@ namespace CodeStack.Community.StockFit.Sw
 
                 var stockTool = ServicesContainer.Instance.GetStockTool();
 
-                var body = stockTool.CreateCylindricalStock(modelDoc as IPartDoc, param.Direction);
+                CylinderParams cylParams;
+
+                var setts = ServicesContainer.Instance.GetService<RoundStockFeatureSettings>();
+
+                var step = setts.StockSteps.FirstOrDefault(s => s.Key == param.StockStep).Value;
+
+                var body = stockTool.CreateCylindricalStock(
+                    modelDoc as IPartDoc, param.Direction,
+                    param.ConcenticWithCylindricalFace, step, out cylParams);
+
+                SetProperties(modelDoc, param, cylParams);
 
                 if (param.CreateSolidBody)
                 {
                     return body;
                 }
+                else
+                {
+                    return true;
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return ex.Message;
             }
+        }
 
-            return true;
+        private static void SetProperties(object modelDoc, RoundStockFeatureParameters param, CylinderParams cylParams)
+        {
+            var metersToInch = new Func<double, double>((m) => m * 39.37007874);
+
+            var model = modelDoc as IModelDoc2;
+            var activeConf = model.ConfigurationManager.ActiveConfiguration.Name;
+
+            model.SetPropertyValue("StockVisible", Convert.ToInt32(param.CreateSolidBody).ToString(), activeConf);
+            model.SetPropertyValue("StockDiameter", metersToInch(cylParams.Radius * 2).ToString(), activeConf);
+            model.SetPropertyValue("StockLength", metersToInch(cylParams.Height).ToString(), activeConf);
         }
 
         private RoundStockFeatureParameters GetParameters(IFeature feat)
@@ -90,6 +115,13 @@ namespace CodeStack.Community.StockFit.Sw
             param.CreateSolidBody = Convert.ToBoolean(
                 GetParameterValue(paramNames, paramValues, 
                 nameof(RoundStockFeatureParameters.CreateSolidBody)));
+
+            param.ConcenticWithCylindricalFace = Convert.ToBoolean(
+                GetParameterValue(paramNames, paramValues,
+                nameof(RoundStockFeatureParameters.ConcenticWithCylindricalFace)));
+
+            param.StockStep = GetParameterValue(paramNames, paramValues,
+                nameof(RoundStockFeatureParameters.StockStep));
 
             if (selObj is object[] && (selObj as object[]).Length > 0)
             {

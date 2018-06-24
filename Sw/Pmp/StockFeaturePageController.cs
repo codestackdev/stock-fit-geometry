@@ -1,8 +1,11 @@
-﻿using SolidWorks.Interop.sldworks;
+﻿using CodeStack.Community.StockFit.Stocks.Cylinder;
+using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using SolidWorksTools.File;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -21,11 +24,15 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 
         private ISldWorks m_App;
 
-        public StockFeaturePageController(ISldWorks app, IStockFeaturePage page, ISwRoundStockTool stockTool)
+        private RoundStockFeatureSettings m_Setts;
+
+        public StockFeaturePageController(ISldWorks app, IStockFeaturePage page,
+            ISwRoundStockTool stockTool, RoundStockFeatureSettings setts)
         {
             m_App = app;
             m_Page = page;
             m_StockTool = stockTool;
+            m_Setts = setts;
 
             m_Page.ParametersChanged += OnParametersChanged;
             m_Page.Closing += OnPageClosing;
@@ -81,7 +88,11 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 
             try
             {
-                return m_StockTool.CreateCylindricalStock(m_Part, par.Direction);
+                CylinderParams cylParams;
+                var step = m_Setts.StockSteps.FirstOrDefault(s => s.Key == par.StockStep).Value;
+
+                return m_StockTool.CreateCylindricalStock(m_Part, par.Direction,
+                    par.ConcenticWithCylindricalFace, step, out cylParams);
             }
             catch(Exception ex)
             {
@@ -97,9 +108,9 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 
             if (isOk)
             {
-                var paramNames = new string[] { nameof(par.CreateSolidBody) };
-                var paramTypes = new int[] { (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger };
-                var paramValues = new string[] { Convert.ToString(par.CreateSolidBody) };
+                var paramNames = new string[] { nameof(par.CreateSolidBody), nameof(par.ConcenticWithCylindricalFace), nameof(par.StockStep) };
+                var paramTypes = new int[] { (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger, (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger, (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeString };
+                var paramValues = new string[] { Convert.ToString(par.CreateSolidBody), Convert.ToString(par.ConcenticWithCylindricalFace), par.StockStep };
 
                 var scopeBody = m_StockTool.GetScopeBody(m_Part, par.Direction);
 
@@ -112,7 +123,11 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 
                     Debug.Assert(selRes);
 
-                    var icons = new string[] { "", "", "" };
+                    string icon = Path.Combine(Path.GetDirectoryName(
+                        typeof(SwStockFirGeometryAddIn).Assembly.Location),
+                        "Icons\\FeatureIcon.bmp");
+                    
+                    var icons = new string[] { icon, icon, icon };
 
                     (m_Part as IModelDoc2).FeatureManager.InsertMacroFeature3("CodeStack.RoundStock",
                         StockMacroFeatureService.Id, null, paramNames, paramTypes,
