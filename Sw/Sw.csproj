@@ -80,19 +80,19 @@
     <Compile Include="Extension\ModelDocExtension.cs" />
     <Compile Include="Math\SwVectorMathService.cs" />
     <Compile Include="Math\MathUtilityEx.cs" />
+    <Compile Include="MVC\RoundStockModel.cs" />
+    <Compile Include="MVC\RoundStockView.cs" />
+    <Compile Include="MVC\RoundStockViewHandler.cs" />
     <Compile Include="Pmp\Attributes\PmpControlTypeAttribute.cs" />
-    <Compile Include="Pmp\StockFeaturePageController.cs" />
-    <Compile Include="Pmp\StockFeaturePagePmpHandler.cs" />
-    <Compile Include="Pmp\StockFeaturePage.cs" />
+    <Compile Include="MVC\RoundStockController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\EnumDisplayNameAttribute.cs" />
     <Compile Include="Reflection\EnumExtension.cs" />
-    <Compile Include="RoundStockFeatureParameters.cs" />
-    <Compile Include="RoundStockFeatureSettings.cs" />
+    <Compile Include="Options\RoundStockFeatureParameters.cs" />
+    <Compile Include="Options\RoundStockFeatureSettings.cs" />
+    <Compile Include="RoundStockMacroFeature.cs" />
     <Compile Include="ServicesContainer.cs" />
     <Compile Include="SolidBodyGeometry.cs" />
-    <Compile Include="RoundStockTool.cs" />
-    <Compile Include="StockMacroFeatureService.cs" />
     <Compile Include="SwStockFitGeometryAddIn.cs" />
   </ItemGroup>
   <ItemGroup>

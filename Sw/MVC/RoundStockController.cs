@@ -4,7 +4,9 @@
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
+using CodeStack.Community.StockFit.MVC;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
+using CodeStack.Community.StockFit.Sw.Options;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools.File;
@@ -16,36 +18,36 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace CodeStack.Community.StockFit.Sw.Pmp
+namespace CodeStack.Community.StockFit.Sw.MVC
 {
     /// <summary>
-    /// Controller which manages view (Property Page) and model (Round Stock Tool)
+    /// Controller which manages view <see cref="RoundStockView"/>  and model <see cref="RoundStockModel"/> 
     /// </summary>
-    public class StockFeaturePageController : IDisposable
+    public class RoundStockController : IDisposable
     {
-        private IStockFeaturePage m_Page;
+        private RoundStockView m_View;
         private IFeature m_Feat;
         private IPartDoc m_Part;
 
         private IBody2 m_TempBody;
 
-        private ISwRoundStockTool m_StockTool;
+        private RoundStockModel m_StockTool;
 
         private ISldWorks m_App;
 
         private RoundStockFeatureSettings m_Setts;
 
-        public StockFeaturePageController(ISldWorks app, IStockFeaturePage page,
-            ISwRoundStockTool stockTool, RoundStockFeatureSettings setts)
+        public RoundStockController(ISldWorks app, RoundStockView view,
+            RoundStockModel stockModel, RoundStockFeatureSettings setts)
         {
             m_App = app;
-            m_Page = page;
-            m_StockTool = stockTool;
+            m_View = view;
+            m_StockTool = stockModel;
             m_Setts = setts;
 
-            m_Page.ParametersChanged += OnParametersChanged;
-            m_Page.Closing += OnPageClosing;
-            m_Page.Closed += OnPageClosed;
+            m_View.ParametersChanged += OnParametersChanged;
+            m_View.Closing += OnPageClosing;
+            m_View.Closed += OnPageClosed;
         }
 
         private void OnPageClosing(bool isOk, RoundStockFeatureParameters par)
@@ -117,9 +119,26 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 
             if (isOk)
             {
-                var paramNames = new string[] { nameof(par.CreateSolidBody), nameof(par.ConcenticWithCylindricalFace), nameof(par.StockStep) };
-                var paramTypes = new int[] { (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger, (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger, (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeString };
-                var paramValues = new string[] { Convert.ToString(par.CreateSolidBody), Convert.ToString(par.ConcenticWithCylindricalFace), par.StockStep };
+                var paramNames = new string[] 
+                {
+                    nameof(par.CreateSolidBody),
+                    nameof(par.ConcenticWithCylindricalFace),
+                    nameof(par.StockStep)
+                };
+
+                var paramTypes = new int[] 
+                {
+                    (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger,
+                    (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger,
+                    (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeString
+                };
+
+                var paramValues = new string[] 
+                {
+                    Convert.ToString(par.CreateSolidBody),
+                    Convert.ToString(par.ConcenticWithCylindricalFace),
+                    par.StockStep
+                };
 
                 var scopeBody = m_StockTool.GetScopeBody(m_Part, par.Direction);
 
@@ -133,14 +152,22 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
                     Debug.Assert(selRes);
 
                     string icon = Path.Combine(Path.GetDirectoryName(
-                        typeof(SwStockFirGeometryAddIn).Assembly.Location),
+                        typeof(SwStockFitGeometryAddIn).Assembly.Location),
                         "Icons\\FeatureIcon.bmp");
                     
                     var icons = new string[] { icon, icon, icon };
 
+                    var dimTypes = new int[] 
+                    {
+                        (int)swDimensionType_e.swRadialDimension,
+                        (int)swDimensionType_e.swLinearDimension
+                    };
+                    var dimValues = new double[] { 0, 0 };
+
                     (m_Part as IModelDoc2).FeatureManager.InsertMacroFeature3("CodeStack.RoundStock",
-                        StockMacroFeatureService.Id, null, paramNames, paramTypes,
-                        paramValues, null, null, null, icons, (int)swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd);
+                        RoundStockMacroFeature.Id, null, paramNames, paramTypes,
+                        paramValues, dimTypes, dimValues, null, icons,
+                        (int)swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd);
                 }
                 else
                 {
@@ -206,7 +233,7 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
                 par = new RoundStockFeatureParameters();//TODO: load from global settings
             }
 
-            m_Page.Show(par, m_Part as IModelDoc2);
+            m_View.Show(par, m_Part as IModelDoc2);
 
             ShowPreview(par);
 
@@ -215,10 +242,10 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 
         public void Dispose()
         {
-            m_Page.ParametersChanged -= OnParametersChanged;
-            m_Page.Closing -= OnPageClosing;
-            m_Page.Closed -= OnPageClosed;
-            m_Page.Dispose();
+            m_View.ParametersChanged -= OnParametersChanged;
+            m_View.Closing -= OnPageClosing;
+            m_View.Closed -= OnPageClosed;
+            m_View.Dispose();
         }
     }
 }

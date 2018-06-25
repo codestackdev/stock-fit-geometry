@@ -17,7 +17,7 @@ namespace SolidWorksTools.File
     {
         public static string GetIcon(this BitmapHandler bmp, string name)
         {
-            var type = typeof(SwStockFirGeometryAddIn);
+            var type = typeof(SwStockFitGeometryAddIn);
 
             var assm = Assembly.GetAssembly(type);
 

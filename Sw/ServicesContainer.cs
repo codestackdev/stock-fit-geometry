@@ -6,8 +6,11 @@
 
 using CodeStack.Community.StockFit.Base;
 using CodeStack.Community.StockFit.Base.Math;
+using CodeStack.Community.StockFit.MVC;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw.Math;
+using CodeStack.Community.StockFit.Sw.MVC;
+using CodeStack.Community.StockFit.Sw.Options;
 using CodeStack.Community.StockFit.Sw.Pmp;
 using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
 using SolidWorks.Interop.sldworks;
@@ -43,7 +46,7 @@ namespace CodeStack.Community.StockFit.Sw
 
             m_Container = new UnityContainer();
 
-            m_Container.RegisterType<ISwRoundStockTool, RoundStockTool>(
+            m_Container.RegisterType<RoundStockModel>(
                 new ContainerControlledLifetimeManager());
 
             m_Container.RegisterInstance(app);
@@ -57,16 +60,11 @@ namespace CodeStack.Community.StockFit.Sw
             m_Container.RegisterType<IVectorMathService, SwVectorMathService>(
                 new ContainerControlledLifetimeManager());
 
-            m_Container.RegisterType<IStockFeaturePage, StockFeaturePage>(
+            m_Container.RegisterType<RoundStockView>(
                 new TransientLifetimeManager());
 
-            m_Container.RegisterType<StockFeaturePageController>(
+            m_Container.RegisterType<RoundStockController>(
                 new TransientLifetimeManager());
-        }
-
-        internal RoundStockTool GetStockTool()
-        {
-            return m_Container.Resolve<ISwRoundStockTool>() as RoundStockTool;
         }
 
         internal TService GetService<TService>()

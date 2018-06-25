@@ -99,7 +99,7 @@ namespace Sw.Tests
             bool concentric = false)
         {
             CylinderParams cylParams;
-            var tempBody = m_StockTool.CreateCylindricalStock(model as IPartDoc, 
+            var tempBody = m_StockModel.CreateCylindricalStock(model as IPartDoc, 
                 inputObj, concentric, 0, out cylParams);
 
             return tempBody;

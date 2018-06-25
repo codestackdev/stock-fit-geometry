@@ -6,6 +6,7 @@
 
 using CodeStack.Community.StockFit.Base.Math.Structures;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
+using CodeStack.Community.StockFit.Sw;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -13,21 +14,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CodeStack.Community.StockFit.Sw
+namespace CodeStack.Community.StockFit.MVC
 {
-    public interface ISwRoundStockTool
-    {
-        IBody2 CreateCylindricalStock(IPartDoc part, object inputObj,
-            bool concentric, double step, out CylinderParams cylParams);
-        IBody2 GetScopeBody(IPartDoc part, object inputObj);
-    }
-
-    public class RoundStockTool : ISwRoundStockTool
+    public class RoundStockModel
     {
         private ISldWorks m_App;
         private CylindricalStockFitExtractor m_CylExt;
 
-        public RoundStockTool(ISldWorks app, CylindricalStockFitExtractor cylExt)
+        public RoundStockModel(ISldWorks app, CylindricalStockFitExtractor cylExt)
         {
             m_App = app;
             m_CylExt = cylExt;

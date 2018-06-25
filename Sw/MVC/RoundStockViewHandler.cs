@@ -12,11 +12,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace CodeStack.Community.StockFit.Sw.Pmp
+namespace CodeStack.Community.StockFit.Sw.MVC
 {
     [ComVisible(true)]
     [Guid("923CD9C0-B8C7-44D3-8028-1039B771CA1A")]
-    public class StockFeaturePagePmpHandler : IPropertyManagerPage2Handler8, IDisposable
+    public class RoundStockViewHandler : IPropertyManagerPage2Handler8, IDisposable
     {
         public event Action<int> ValueChanged;
         public event Action<bool> Closed;
