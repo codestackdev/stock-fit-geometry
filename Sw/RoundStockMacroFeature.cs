@@ -36,7 +36,7 @@ namespace CodeStack.Community.StockFit.Sw
             {
                 try
                 {
-                    var param = GetParameters(feature as IFeature);
+                    var param = featData.DeserializeParameters<RoundStockFeatureParameters>();
 
                     var ctrl = ServicesContainer.Instance.GetService<RoundStockController>();
 
@@ -61,7 +61,9 @@ namespace CodeStack.Community.StockFit.Sw
             {
                 var stockModel = ServicesContainer.Instance.GetService<RoundStockModel>();
 
-                var param = GetParameters(feature as IFeature);
+                var featData = (feature as IFeature).GetDefinition() as IMacroFeatureData;
+
+                var param = featData.DeserializeParameters<RoundStockFeatureParameters>();
                 
                 CylinderParams cylParams;
 
@@ -76,8 +78,6 @@ namespace CodeStack.Community.StockFit.Sw
                 //temp
                 SetProperties(modelDoc, param, cylParams);
                 //
-
-                var featData = (feature as IFeature).GetDefinition() as IMacroFeatureData;
                 
                 var dispDims = featData.GetDisplayDimensions() as object[];
 
@@ -108,6 +108,7 @@ namespace CodeStack.Community.StockFit.Sw
             }
         }
 
+#warning UpdateBodyEntitiesIds method doesn't update entities so no feature can be created on top of the stock feature
         private static void UpdateBodyEntitiesIds(IBody2 body, IMacroFeatureData featData)
         {
             object faces;
@@ -221,84 +222,6 @@ namespace CodeStack.Community.StockFit.Sw
             model.SetPropertyValue("StockVisible", Convert.ToInt32(param.CreateSolidBody).ToString(), activeConf);
             model.SetPropertyValue("StockDiameter", metersToInch(cylParams.Radius * 2).ToString(), activeConf);
             model.SetPropertyValue("StockLength", metersToInch(cylParams.Height).ToString(), activeConf);
-        }
-
-        private RoundStockFeatureParameters GetParameters(IFeature feat)
-        {
-            var featData = (feat as IFeature).GetDefinition() as IMacroFeatureData;
-
-            object paramNames = null;
-            object paramValues = null;
-            object paramTypes = null;
-
-            featData.GetParameters(out paramNames, out paramTypes, out paramValues);
-
-            object selObj;
-            object selObjType;
-            object selMarks;
-            object selDrViews;
-            object compXforms;
-
-            featData.GetSelections3(out selObj, out selObjType, out selMarks, out selDrViews, out compXforms);
-
-            var param = new RoundStockFeatureParameters();
-
-            param.CreateSolidBody = Convert.ToBoolean(
-                GetParameterValue(paramNames, paramValues, 
-                nameof(RoundStockFeatureParameters.CreateSolidBody)));
-
-            param.ConcenticWithCylindricalFace = Convert.ToBoolean(
-                GetParameterValue(paramNames, paramValues,
-                nameof(RoundStockFeatureParameters.ConcenticWithCylindricalFace)));
-
-            param.StockStep = GetParameterValue(paramNames, paramValues,
-                nameof(RoundStockFeatureParameters.StockStep));
-
-            if (selObj is object[] && (selObj as object[]).Length > 0)
-            {
-                param.Direction = (selObj as object[]).First();
-            }
-            else
-            {
-                throw new NullReferenceException("Referenced entity is missing");
-            }
-
-            return param;
-        }
-
-        private string GetParameterValue(object paramNames, object paramValues, string name)
-        {
-            if (!(paramNames is string[]))
-            {
-                throw new ArgumentNullException(nameof(paramNames));
-            }
-
-            if (!(paramValues is string[]))
-            {
-                throw new ArgumentNullException(nameof(paramValues));
-            }
-
-            var paramNamesList = (paramNames as string[]).ToList();
-
-            var index = paramNamesList.IndexOf(name);
-
-            if (index != -1)
-            {
-                var paramValsArr = paramValues as string[];
-
-                if (paramValsArr.Length > index)
-                {
-                    return paramValsArr[index];
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException($"Parameter {name} doesn't have a value");
-                }
-            }
-            else
-            {
-                throw new IndexOutOfRangeException($"Failed to read parameter {name}");
-            }
         }
 
         public object Security(object app, object modelDoc, object feature)
