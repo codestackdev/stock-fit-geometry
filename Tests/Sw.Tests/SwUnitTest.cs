@@ -1,6 +1,8 @@
 ﻿using CodeStack.Community.DevTools.Sw.Testing;
 using CodeStack.Community.DevTools.Sw.Testing.Parameters;
+using CodeStack.Community.StockFit.MVC;
 using CodeStack.Community.StockFit.Sw;
+using CodeStack.Community.StockFit.Sw.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ namespace Sw.Tests
     {
         protected TestService Sw { get; private set; }
 
-        protected RoundStockTool m_StockTool;
+        protected RoundStockModel m_StockModel;
 
         [TestInitialize]
         public void OnInitialize()
@@ -31,7 +33,8 @@ namespace Sw.Tests
 
             Sw = new TestService(prms);
 
-            m_StockTool = new ServicesContainer(Sw.SldWorks, new RoundStockFeatureSettings()).GetStockTool();
+            m_StockModel = new ServicesContainer(Sw.SldWorks, 
+                new RoundStockFeatureSettings()).GetService<RoundStockModel>();
         }
 
         [TestCleanup]

@@ -4,6 +4,8 @@
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
+using CodeStack.Community.StockFit.Sw.MVC;
+using CodeStack.Community.StockFit.Sw.Options;
 using CodeStack.Community.StockFit.Sw.Pmp;
 using CodeStack.Community.StockFit.Sw.Reflection;
 using SolidWorks.Interop.sldworks;
@@ -29,8 +31,11 @@ namespace CodeStack.Community.StockFit.Sw
         Title = "Stock Fit Geometry",
         LoadAtStartup = true
         )]
-    public class SwStockFirGeometryAddIn : ISwAddin
+    [ProgId(ID)]
+    public class SwStockFitGeometryAddIn : ISwAddin
     {
+        public const string ID = "CodeStack.StockFitGeometry";
+
         private enum CommandsGroups_e
         {
             [EnumDisplayName("Stock Fit Geometry")]
@@ -229,7 +234,7 @@ Continue?";
             switch ((Commands_e)cmd)
             {
                 case Commands_e.CreateStockFeature:
-                    var ctrl = m_Container.GetService<StockFeaturePageController>();
+                    var ctrl = m_Container.GetService<RoundStockController>();
                     ctrl.Process(m_App.IActiveDoc2 as IPartDoc);
                     break;
             }

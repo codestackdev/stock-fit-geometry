@@ -4,6 +4,8 @@
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
+using CodeStack.Community.StockFit.MVC;
+using CodeStack.Community.StockFit.Sw.Options;
 using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
 using CodeStack.Community.StockFit.Sw.Reflection;
 using SolidWorks.Interop.sldworks;
@@ -16,30 +18,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace CodeStack.Community.StockFit.Sw.Pmp
+namespace CodeStack.Community.StockFit.Sw.MVC
 {
-    public interface IStockFeaturePage : IDisposable
-    {
-        /// <summary>
-        /// Raises when parameter is changed and preview needs to be updated
-        /// </summary>
-        event Action<RoundStockFeatureParameters> ParametersChanged;
-
-        /// <summary>
-        /// Raises when page is closed
-        /// </summary>
-        /// <remarks>Generate feature in the event handler</remarks>
-        event Action<bool, RoundStockFeatureParameters> Closed;
-
-        /// <summary>
-        /// Raises when page is about to be closed
-        /// </summary>
-        event Action<bool, RoundStockFeatureParameters> Closing;
-
-        void Show(RoundStockFeatureParameters parameters, IModelDoc2 model);
-    }
-
-    public class StockFeaturePage : IStockFeaturePage
+    public class RoundStockView
     {
         public event Action<RoundStockFeatureParameters> ParametersChanged;
         public event Action<bool, RoundStockFeatureParameters> Closed;
@@ -69,10 +50,10 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
         }
 
         private ISldWorks m_App;
-        private ISwRoundStockTool m_StockTool;
+        private RoundStockModel m_StockModel;
 
         private IPropertyManagerPage2 m_Page;
-        private StockFeaturePagePmpHandler m_Handler;
+        private RoundStockViewHandler m_Handler;
 
         private Dictionary<Controls_e, IPropertyManagerPageControl> m_Controls;
 
@@ -81,13 +62,13 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
 
         private RoundStockFeatureSettings m_Setts;
 
-        public StockFeaturePage(ISldWorks app, ISwRoundStockTool stockTool, RoundStockFeatureSettings setts)
+        public RoundStockView(ISldWorks app, RoundStockModel stockTool, RoundStockFeatureSettings setts)
         {
             m_App = app;
-            m_StockTool = stockTool;
+            m_StockModel = stockTool;
             m_Setts = setts;
 
-            m_Handler = new StockFeaturePagePmpHandler();
+            m_Handler = new RoundStockViewHandler();
             m_Handler.Closing += OnClosing;
             m_Handler.Closed += OnClosed;
             m_Handler.ValueChanged += OnValueChanged;
@@ -105,7 +86,7 @@ namespace CodeStack.Community.StockFit.Sw.Pmp
                 (int)swPropertyManagerPageMessageExpanded.swMessageBoxExpand, "Stock Feature");
 
             string icon = Path.Combine(Path.GetDirectoryName(
-                        typeof(SwStockFirGeometryAddIn).Assembly.Location),
+                        typeof(SwStockFitGeometryAddIn).Assembly.Location),
                         "Icons\\FeatureIcon.bmp");
 
             m_Page.SetTitleBitmap2(icon);
