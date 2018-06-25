@@ -13,6 +13,14 @@ namespace System
 {
     public static class EnumExtension
     {
+        /// <summary>
+        /// Get the specified attribute from the enumerator field
+        /// </summary>
+        /// <typeparam name="TAtt">Attribute type</typeparam>
+        /// <param name="enumer">Enumerator field</param>
+        /// <returns>Attribute</returns>
+        /// <exception cref="NullReferenceException"/>
+        /// <remarks>This method throws an exception if attribute is missing</remarks>
         public static TAtt GetAttribute<TAtt>(this Enum enumer)
             where TAtt : Attribute
         {
