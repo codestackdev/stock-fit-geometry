@@ -7,6 +7,7 @@
 using CodeStack.Community.StockFit.MVC;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw.Options;
+using CodeStack.Community.StockFit.Sw.Services;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools.File;
@@ -17,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Unity.Attributes;
 
 namespace CodeStack.Community.StockFit.Sw.MVC
 {
@@ -37,17 +39,44 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
         private RoundStockFeatureSettings m_Setts;
 
+        private OptionsStore m_OptsStore;
+
         public RoundStockController(ISldWorks app, RoundStockView view,
-            RoundStockModel stockModel, RoundStockFeatureSettings setts)
+            RoundStockModel stockModel, RoundStockFeatureSettings setts,
+            OptionsStore optsStore)
         {
             m_App = app;
             m_View = view;
             m_StockTool = stockModel;
             m_Setts = setts;
+            m_OptsStore = optsStore;
 
             m_View.ParametersChanged += OnParametersChanged;
             m_View.Closing += OnPageClosing;
             m_View.Closed += OnPageClosed;
+            m_View.Help += OnHelp;
+            m_View.WhatsNew += OnWhatsNew;
+        }
+
+        private void OnWhatsNew()
+        {
+            OpenHelp("https://www.codestack.net/labs/solidworks/stock-fit-geometry/whats-new");
+        }
+
+        private void OnHelp()
+        {
+            OpenHelp("https://www.codestack.net/labs/solidworks/stock-fit-geometry/");
+        }
+
+        private void OpenHelp(string link)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(link);
+            }
+            catch
+            {
+            }
         }
 
         private void OnPageClosing(bool isOk, RoundStockFeatureParameters par)
@@ -119,67 +148,32 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
             if (isOk)
             {
-                var paramNames = new string[] 
-                {
-                    nameof(par.CreateSolidBody),
-                    nameof(par.ConcenticWithCylindricalFace),
-                    nameof(par.StockStep)
-                };
+                par.ScopeBody = m_StockTool.GetScopeBody(m_Part, par.Direction);
 
-                var paramTypes = new int[] 
-                {
-                    (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger,
-                    (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger,
-                    (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeString
-                };
+                m_OptsStore.Save(par);
 
-                var paramValues = new string[] 
-                {
-                    Convert.ToString(par.CreateSolidBody),
-                    Convert.ToString(par.ConcenticWithCylindricalFace),
-                    par.StockStep
-                };
-
-                var scopeBody = m_StockTool.GetScopeBody(m_Part, par.Direction);
+                string icon = Path.Combine(Path.GetDirectoryName(
+                    typeof(SwStockFitGeometryAddIn).Assembly.Location),
+                    "Icons\\FeatureIcon.bmp");
 
                 if (m_Feat == null)
                 {
-                    (m_Part as IModelDoc2).ClearSelection2(true);
+                    var feat = (m_Part as IModelDoc2).FeatureManager.InsertComFeature(
+                        "CodeStack.RoundStock", RoundStockMacroFeature.Id, par,
+                        new MacroFeatureDimension[] 
+                        {
+                            new MacroFeatureDimension(swDimensionType_e.swRadialDimension, 0),
+                            new MacroFeatureDimension(swDimensionType_e.swLinearDimension, 0)
+                        }, new MacroFeatureIcons(icon),
+                        swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd);
 
-                    var selRes = (m_Part as IModelDoc2).SelectDispatches(
-                        false, null, par.Direction, scopeBody);
-
-                    Debug.Assert(selRes);
-
-                    string icon = Path.Combine(Path.GetDirectoryName(
-                        typeof(SwStockFitGeometryAddIn).Assembly.Location),
-                        "Icons\\FeatureIcon.bmp");
-                    
-                    var icons = new string[] { icon, icon, icon };
-
-                    var dimTypes = new int[] 
-                    {
-                        (int)swDimensionType_e.swRadialDimension,
-                        (int)swDimensionType_e.swLinearDimension
-                    };
-                    var dimValues = new double[] { 0, 0 };
-
-                    (m_Part as IModelDoc2).FeatureManager.InsertMacroFeature3("CodeStack.RoundStock",
-                        RoundStockMacroFeature.Id, null, paramNames, paramTypes,
-                        paramValues, dimTypes, dimValues, null, icons,
-                        (int)swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd);
+                    Debug.Assert(feat != null);
                 }
                 else
                 {
                     var featData = m_Feat.GetDefinition() as IMacroFeatureData;
 
-                    featData.SetParameters(paramNames, paramTypes, paramValues);
-
-                    featData.SetSelections2(new DispatchWrapper[]
-                    {
-                        new DispatchWrapper(par.Direction),
-                        new DispatchWrapper(scopeBody)
-                    }, new int[] { 0, 0 }, new IView[2] { null, null });
+                    featData.SerializeParameters(par);
 
                     var modRes = m_Feat.ModifyDefinition(featData, m_Part as IModelDoc2, null);
 
@@ -230,14 +224,12 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
             if (par == null)
             {
-                par = new RoundStockFeatureParameters();//TODO: load from global settings
+                par = m_OptsStore.Load<RoundStockFeatureParameters>();
             }
 
             m_View.Show(par, m_Part as IModelDoc2);
 
             ShowPreview(par);
-
-            //TODO: if feat is not null - access selection and get parameters
         }
 
         public void Dispose()
@@ -245,6 +237,9 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_View.ParametersChanged -= OnParametersChanged;
             m_View.Closing -= OnPageClosing;
             m_View.Closed -= OnPageClosed;
+            m_View.Help -= OnHelp;
+            m_View.WhatsNew -= OnWhatsNew;
+
             m_View.Dispose();
         }
     }

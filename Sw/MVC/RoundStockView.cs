@@ -25,6 +25,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
         public event Action<RoundStockFeatureParameters> ParametersChanged;
         public event Action<bool, RoundStockFeatureParameters> Closed;
         public event Action<bool, RoundStockFeatureParameters> Closing;
+        public event Action Help;
+        public event Action WhatsNew;
 
         private enum Controls_e
         {
@@ -72,6 +74,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_Handler.Closing += OnClosing;
             m_Handler.Closed += OnClosed;
             m_Handler.ValueChanged += OnValueChanged;
+            m_Handler.Help += OnHelp;
+            m_Handler.WhatsNew += OnWhatsNew;
 
             var options = swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton |
                 swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
@@ -92,6 +96,16 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_Page.SetTitleBitmap2(icon);
 
             AddControls();
+        }
+
+        private void OnWhatsNew()
+        {
+            WhatsNew?.Invoke();
+        }
+
+        private void OnHelp()
+        {
+            Help?.Invoke();
         }
 
         private void OnClosing(bool isOk)
@@ -204,6 +218,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_Handler.Closed -= OnClosed;
             m_Handler.ValueChanged -= OnValueChanged;
             m_Handler.Dispose();
+            m_Handler.Help -= OnHelp;
+            m_Handler.WhatsNew -= OnWhatsNew;
         }
     }
 }

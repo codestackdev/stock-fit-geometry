@@ -13,6 +13,7 @@ using CodeStack.Community.StockFit.Sw.MVC;
 using CodeStack.Community.StockFit.Sw.Options;
 using CodeStack.Community.StockFit.Sw.Pmp;
 using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
+using CodeStack.Community.StockFit.Sw.Services;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swpublished;
 using System;
@@ -40,7 +41,7 @@ namespace CodeStack.Community.StockFit.Sw
             private set;
         }
 
-        public ServicesContainer(ISldWorks app, RoundStockFeatureSettings setts)
+        public ServicesContainer(ISldWorks app)
         {
             Instance = this;
 
@@ -51,9 +52,7 @@ namespace CodeStack.Community.StockFit.Sw
 
             m_Container.RegisterInstance(app);
             m_Container.RegisterInstance(app.IGetMathUtility() as IMathUtility);
-
-            m_Container.RegisterInstance(setts);
-
+            
             m_Container.RegisterType<IStockFitExtractor<CylinderParams>, CylindricalStockFitExtractor>(
                 new ContainerControlledLifetimeManager());
 
@@ -65,6 +64,13 @@ namespace CodeStack.Community.StockFit.Sw
 
             m_Container.RegisterType<RoundStockController>(
                 new TransientLifetimeManager());
+
+            m_Container.RegisterType<OptionsStore>(
+                new ContainerControlledLifetimeManager());
+
+            var setts = m_Container.Resolve<RoundStockFeatureSettings>();
+
+            m_Container.RegisterInstance(setts);
         }
 
         internal TService GetService<TService>()

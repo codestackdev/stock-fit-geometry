@@ -4,10 +4,12 @@
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
+using CodeStack.Community.StockFit.Sw.CommandManager.Attributes;
 using CodeStack.Community.StockFit.Sw.MVC;
 using CodeStack.Community.StockFit.Sw.Options;
 using CodeStack.Community.StockFit.Sw.Pmp;
 using CodeStack.Community.StockFit.Sw.Reflection;
+using CodeStack.Community.StockFit.Sw.UI;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -27,8 +29,8 @@ namespace CodeStack.Community.StockFit.Sw
 
     [Guid("DAA5615D-0BA6-461A-90DD-9E016E24C7AB"), ComVisible(true)]
     [SwAddin(
-        Description = "Stock Fit Geometry (Preview)",
-        Title = "Stock Fit Geometry",
+        Description = "Stock Master (Preview)",
+        Title = "Stock Master",
         LoadAtStartup = true
         )]
     [ProgId(ID)]
@@ -38,8 +40,8 @@ namespace CodeStack.Community.StockFit.Sw
 
         private enum CommandsGroups_e
         {
-            [EnumDisplayName("Stock Fit Geometry")]
-            [Description("Stock Fit Geometry")]
+            [EnumDisplayName("Stock Master")]
+            [Description("Stock Master")]
             Main
         }
 
@@ -62,7 +64,13 @@ namespace CodeStack.Community.StockFit.Sw
         {
             [EnumDisplayName("Create Stock Feature")]
             [Description("Creates Stock Feature")]
-            CreateStockFeature
+            [CommandItemInfo(swCommandItemType_e.swMenuItem | swCommandItemType_e.swToolbarItem, swWorkspaceTypes_e.Part)]
+            CreateStockFeature,
+
+            [EnumDisplayName("About...")]
+            [Description("About Stock Master")]
+            [CommandItemInfo(swCommandItemType_e.swMenuItem, swWorkspaceTypes_e.All)]
+            About
         }
         
         private ISldWorks m_App;
@@ -70,6 +78,8 @@ namespace CodeStack.Community.StockFit.Sw
         private ICommandManager m_CmdMgr;
 
         private ServicesContainer m_Container;
+
+        private Dictionary<int, swWorkspaceTypes_e> m_CachedCmdsEnable;
 
         #region SolidWorks Registration
 
@@ -142,11 +152,8 @@ Continue?";
             {
                 return false;
             }
-
-            //TODO: load from settings
-            var setts = new RoundStockFeatureSettings();
-                        
-            m_Container = new ServicesContainer(m_App, setts);
+                                    
+            m_Container = new ServicesContainer(m_App);
 
             m_AddInId = cookie;
 
@@ -181,6 +188,7 @@ Continue?";
         private void AddCommandMgr()
         {
             var title = CommandsGroups_e.Main.GetAttribute<DisplayNameAttribute>().DisplayName;
+
             var toolTip = CommandsGroups_e.Main.GetAttribute<DescriptionAttribute>().Description;
 
             int cmdGroupErr = 0;
@@ -209,17 +217,23 @@ Continue?";
             cmdGroup.SmallIconList = bmpHelper.GetIcon("ToolbarSmall.bmp");
             cmdGroup.LargeMainIcon = bmpHelper.GetIcon("MainIconLarge.bmp");
             cmdGroup.SmallMainIcon = bmpHelper.GetIcon("MainIconSmall.bmp");
-            
+
+            m_CachedCmdsEnable = new Dictionary<int, swWorkspaceTypes_e>();
+
             foreach (Enum cmd in Enum.GetValues(typeof(Commands_e)))
             {
                 var cmdTitle = cmd.GetAttribute<DisplayNameAttribute>().DisplayName;
                 var cmdToolTip = cmd.GetAttribute<DescriptionAttribute>().Description;
+                var cmdInfoAtt = cmd.GetAttribute<CommandItemInfoAttribute>();
+                var tbOpts = cmdInfoAtt.MenuToolbarVisibility;
 
                 var cmdId = Convert.ToInt32(cmd);
 
+                m_CachedCmdsEnable.Add(cmdId, cmdInfoAtt.SupportedWorkspaces);
+
                 cmdGroup.AddCommandItem2(cmdTitle, -1, cmdToolTip,
                     cmdTitle, 0, $"{nameof(OnCommandClick)}({cmdId})", $"{nameof(OnCommandEnable)}({cmdId})", cmdId,
-                    (int)(swCommandItemType_e.swMenuItem | swCommandItemType_e.swToolbarItem));
+                    (int)tbOpts);
             }
 
             cmdGroup.HasToolbar = true;
@@ -237,22 +251,50 @@ Continue?";
                     var ctrl = m_Container.GetService<RoundStockController>();
                     ctrl.Process(m_App.IActiveDoc2 as IPartDoc);
                     break;
+
+                case Commands_e.About:
+                    var aboutForm = new AboutForm();
+                    aboutForm.ShowDialog();
+                    break;
             }
         }
 
         public int OnCommandEnable(int cmd)
         {
-            switch ((Commands_e)cmd)
+            var supportedSpaces = m_CachedCmdsEnable[cmd];
+
+            swWorkspaceTypes_e curSpace = swWorkspaceTypes_e.NoDocuments;
+
+            if (m_App.IActiveDoc2 == null)
             {
-                case Commands_e.CreateStockFeature:
-                    if (!(m_App.IActiveDoc2 is IPartDoc))
-                    {
-                        return (int)CommandItemEnableState_e.DeselectDisable;
-                    }
-                    break;
+                curSpace = swWorkspaceTypes_e.NoDocuments;
+            }
+            else
+            {
+                switch ((swDocumentTypes_e)m_App.IActiveDoc2.GetType())
+                {
+                    case swDocumentTypes_e.swDocPART:
+                        curSpace = swWorkspaceTypes_e.Part;
+                        break;
+
+                    case swDocumentTypes_e.swDocASSEMBLY:
+                        curSpace = swWorkspaceTypes_e.Assembly;
+                        break;
+
+                    case swDocumentTypes_e.swDocDRAWING:
+                        curSpace = swWorkspaceTypes_e.Drawing;
+                        break;
+                }
             }
 
-            return (int)CommandItemEnableState_e.DeselectEnable;
+            if (supportedSpaces.HasFlag(curSpace))
+            {
+                return (int)CommandItemEnableState_e.DeselectEnable;
+            }
+            else
+            {
+                return (int)CommandItemEnableState_e.DeselectDisable;
+            }
         }
 
         private void RemoveCommandMgr()
