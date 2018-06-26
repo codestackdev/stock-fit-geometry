@@ -21,6 +21,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
         public event Action<int> ValueChanged;
         public event Action<bool> Closed;
         public event Action<bool> Closing;
+        public event Action Help;
+        public event Action WhatsNew;
 
         private bool m_IsOk;
 
@@ -76,6 +78,7 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
         public bool OnHelp()
         {
+            Help?.Invoke();
             return true;
         }
 
@@ -177,6 +180,7 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
         public void OnWhatsNew()
         {
+            WhatsNew?.Invoke();
         }
 
         public int OnWindowFromHandleControlCreated(int Id, bool Status)

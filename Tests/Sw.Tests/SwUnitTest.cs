@@ -33,8 +33,7 @@ namespace Sw.Tests
 
             Sw = new TestService(prms);
 
-            m_StockModel = new ServicesContainer(Sw.SldWorks, 
-                new RoundStockFeatureSettings()).GetService<RoundStockModel>();
+            m_StockModel = new ServicesContainer(Sw.SldWorks).GetService<RoundStockModel>();
         }
 
         [TestCleanup]
