@@ -168,6 +168,22 @@ namespace CodeStack.Community.StockFit.Sw.MVC
                         swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd);
 
                     Debug.Assert(feat != null);
+
+                    //swpuc only
+                    if (feat != null)
+                    {
+                        int index = 1;
+                        var featNameBase = $"Stock Block Round for config {(m_Part as IModelDoc2).IGetActiveConfiguration().Name}";
+                        var featName = featNameBase;
+                        while ((m_Part as IModelDoc2).FeatureManager.IsNameUsed(
+                            (int)swNameType_e.swFeatureName, featName))
+                        {
+                            featName = featNameBase + index++;
+                        }
+
+                        feat.Name = featName;
+                    }
+                    //
                 }
                 else
                 {

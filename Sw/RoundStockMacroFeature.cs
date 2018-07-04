@@ -214,7 +214,7 @@ namespace CodeStack.Community.StockFit.Sw
 
         private static void SetProperties(object modelDoc, RoundStockFeatureParameters param, CylinderParams cylParams)
         {
-            var metersToInch = new Func<double, double>((m) => m * 39.37007874);
+            var metersToInch = new Func<double, double>((m) => System.Math.Round(m * 39.37007874, 3));
 
             var model = modelDoc as IModelDoc2;
             var activeConf = model.ConfigurationManager.ActiveConfiguration.Name;
