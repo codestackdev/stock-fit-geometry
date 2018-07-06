@@ -23,7 +23,7 @@
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -151,7 +151,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF EXIST "%25Windir%25\Microsoft.NET\Framework64\v4.0.30319\regasm.exe" "%25Windir%25\Microsoft.NET\Framework64\v4.0.30319\regasm" /codebase "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>IF '$(ConfigurationName)' == 'Release' GOTO :END
+(
+IF EXIST "%25Windir%25\Microsoft.NET\Framework64\v4.0.30319\regasm.exe" "%25Windir%25\Microsoft.NET\Framework64\v4.0.30319\regasm" /codebase "$(TargetPath)"
+)
+:END</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
