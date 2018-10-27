@@ -39,7 +39,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\EnumerableExtension.cs" />
     <Compile Include="IGeometry.cs" />
     <Compile Include="IStockFitExtractor.cs" />
     <Compile Include="Math\IVectorMathService.cs" />

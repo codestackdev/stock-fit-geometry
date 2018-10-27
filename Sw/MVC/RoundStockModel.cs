@@ -18,22 +18,31 @@ namespace CodeStack.Community.StockFit.MVC
 {
     public class RoundStockModel
     {
-        private ISldWorks m_App;
-        private CylindricalStockFitExtractor m_CylExt;
+        private readonly ISldWorks m_App;
+        private readonly IModeler m_Modeler;
+        private readonly CylindricalStockFitExtractor m_CylExt;
 
         public RoundStockModel(ISldWorks app, CylindricalStockFitExtractor cylExt)
         {
             m_App = app;
+            m_Modeler = app.IGetModeler();
             m_CylExt = cylExt;
         }
 
-        public IBody2 CreateCylindricalStock(IPartDoc part, object inputObj, 
-            bool concentric, double step, out CylinderParams cylParams)
+        public IBody2 CreateCylindricalStock(CylinderParams cylParams)
         {
+            return m_Modeler.CreateCylinder(new SwEx.MacroFeature.Data.Point(cylParams.Origin.ToArray()),
+                new SwEx.MacroFeature.Data.Vector(cylParams.Axis.ToArray()),
+                cylParams.Radius, cylParams.Height);
+        }
+
+        public CylinderParams GetCylinderParameters(IPartDoc part, object inputObj, bool concentric, double step)
+        {
+            CylinderParams cylParams;
             var body = GetScopeBody(part, inputObj);
 
             var dir = GetDirection(inputObj);
-            
+
             cylParams = m_CylExt.GetStockParameters(new SolidBodyGeometry(body), dir);
 
             if (concentric && (inputObj is IFace2) && (inputObj as IFace2).IGetSurface().IsCylinder())
@@ -48,22 +57,22 @@ namespace CodeStack.Community.StockFit.MVC
                 cylParams = m_CylExt.FitToStockSizeByStep(cylParams, step);
             }
 
-            return CreateCylindricalBody(part, cylParams);
+            return cylParams;
         }
 
-        private IBody2 CreateCylindricalBody(IPartDoc part, CylinderParams cylParams)
-        {
-            var cylTempBody = m_App.IGetModeler().CreateBodyFromCyl(new double[]
-                    {
-                        cylParams.Origin.X, cylParams.Origin.Y, cylParams.Origin.Z,
-                        cylParams.Axis.X, cylParams.Axis.Y, cylParams.Axis.Z,
-                        cylParams.Radius, cylParams.Height
-                    }) as IBody2;
+        //private IBody2 CreateCylindricalBody(IPartDoc part, CylinderParams cylParams)
+        //{
+        //    var cylTempBody = m_App.IGetModeler().CreateBodyFromCyl(new double[]
+        //            {
+        //                cylParams.Origin.X, cylParams.Origin.Y, cylParams.Origin.Z,
+        //                cylParams.Axis.X, cylParams.Axis.Y, cylParams.Axis.Z,
+        //                cylParams.Radius, cylParams.Height
+        //            }) as IBody2;
 
-            return cylTempBody;
-        }
+        //    return cylTempBody;
+        //}
 
-        public IBody2 GetScopeBody(IPartDoc part, object inputObj)
+        private IBody2 GetScopeBody(IPartDoc part, object inputObj)
         {
             if (inputObj is IFace2)
             {

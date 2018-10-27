@@ -50,11 +50,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
-      <HintPath>..\..\Sw\thirdpty\SolidWorks.Interop.sldworks.dll</HintPath>
+      <HintPath>..\..\..\swex-common-dev\thirdpty\SolidWorks.Interop.sldworks.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="SolidWorks.Interop.swconst">
-      <HintPath>..\..\Sw\thirdpty\SolidWorks.Interop.swconst.dll</HintPath>
+      <HintPath>..\..\..\swex-common-dev\thirdpty\SolidWorks.Interop.swconst.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />

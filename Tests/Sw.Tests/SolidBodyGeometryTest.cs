@@ -48,12 +48,12 @@ namespace Sw.Tests
 
             var comp = new DoubleEqualityComparerWithTolerance();
             
-            Assert.IsTrue(points[0].AreEqualItemWise(new double[] { 0.00966608998524698, 0.019696737014236, 0.08 }, comp));
-            Assert.IsTrue(points[1].AreEqualItemWise(new double[] { -0.0337478821675263, 0.019696737014236, 0.08 }, comp));
-            Assert.IsTrue(points[2].AreEqualItemWise(new double[] { 0.00966608998524698, 0.019696737014236, 0.08 }, comp));
-            Assert.IsTrue(points[3].AreEqualItemWise(new double[] { 0.00966608998524698, -0.0315523907373247, 0.08 }, comp));
-            Assert.IsTrue(points[4].AreEqualItemWise(new double[] { 0.00966608998524698, 0.019696737014236, 0.08 }, comp));
-            Assert.IsTrue(points[5].AreEqualItemWise(new double[] { -0.0207842984279311, 0.00525494529478507, 0 }, comp));
+            Assert.IsTrue(points[0].SequenceEqual(new double[] { 0.00966608998524698, 0.019696737014236, 0.08 }, comp));
+            Assert.IsTrue(points[1].SequenceEqual(new double[] { -0.0337478821675263, 0.019696737014236, 0.08 }, comp));
+            Assert.IsTrue(points[2].SequenceEqual(new double[] { 0.00966608998524698, 0.019696737014236, 0.08 }, comp));
+            Assert.IsTrue(points[3].SequenceEqual(new double[] { 0.00966608998524698, -0.0315523907373247, 0.08 }, comp));
+            Assert.IsTrue(points[4].SequenceEqual(new double[] { 0.00966608998524698, 0.019696737014236, 0.08 }, comp));
+            Assert.IsTrue(points[5].SequenceEqual(new double[] { -0.0207842984279311, 0.00525494529478507, 0 }, comp));
         }
 
         [TestMethod]
@@ -89,12 +89,12 @@ namespace Sw.Tests
 
             var comp = new DoubleEqualityComparerWithTolerance();
 
-            Assert.IsTrue(points[0].AreEqualItemWise(new double[] { -0.110883845818614, 0.0605238203210351, -0.0239825852813666 }, comp));
-            Assert.IsTrue(points[1].AreEqualItemWise(new double[] { -0.0412497473005035, 0.179859854385059, 0.0275862063054218 }, comp));
-            Assert.IsTrue(points[2].AreEqualItemWise(new double[] { -0.142959784835457, 0.106453187928056, 0.00530736214458289 }, comp));
-            Assert.IsTrue(points[3].AreEqualItemWise(new double[] { -0.0405325336202925, 0.171216718860278, 0.0419248817887173 }, comp));
-            Assert.IsTrue(points[4].AreEqualItemWise(new double[] { -0.13321429487189, 0.0821558975737544, 0.0167696845654225 }, comp));
-            Assert.IsTrue(points[5].AreEqualItemWise(new double[] { -0.0104076774276791, 0.149982352301203, -0.0286994667274928 }, comp));
+            Assert.IsTrue(points[0].SequenceEqual(new double[] { -0.110883845818614, 0.0605238203210351, -0.0239825852813666 }, comp));
+            Assert.IsTrue(points[1].SequenceEqual(new double[] { -0.0412497473005035, 0.179859854385059, 0.0275862063054218 }, comp));
+            Assert.IsTrue(points[2].SequenceEqual(new double[] { -0.142959784835457, 0.106453187928056, 0.00530736214458289 }, comp));
+            Assert.IsTrue(points[3].SequenceEqual(new double[] { -0.0405325336202925, 0.171216718860278, 0.0419248817887173 }, comp));
+            Assert.IsTrue(points[4].SequenceEqual(new double[] { -0.13321429487189, 0.0821558975737544, 0.0167696845654225 }, comp));
+            Assert.IsTrue(points[5].SequenceEqual(new double[] { -0.0104076774276791, 0.149982352301203, -0.0286994667274928 }, comp));
         }
 
         private void TempDisplayPoints(IModelDoc2 m, List<double[]> pts)

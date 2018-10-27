@@ -9,10 +9,7 @@ using CodeStack.Community.StockFit.Base.Math;
 using CodeStack.Community.StockFit.MVC;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw.Math;
-using CodeStack.Community.StockFit.Sw.MVC;
 using CodeStack.Community.StockFit.Sw.Options;
-using CodeStack.Community.StockFit.Sw.Pmp;
-using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
 using CodeStack.Community.StockFit.Sw.Services;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swpublished;
@@ -59,11 +56,11 @@ namespace CodeStack.Community.StockFit.Sw
             m_Container.RegisterType<IVectorMathService, SwVectorMathService>(
                 new ContainerControlledLifetimeManager());
 
-            m_Container.RegisterType<RoundStockView>(
-                new TransientLifetimeManager());
+            //m_Container.RegisterType<RoundStockView>(
+            //    new TransientLifetimeManager());
 
-            m_Container.RegisterType<RoundStockController>(
-                new TransientLifetimeManager());
+            //m_Container.RegisterType<RoundStockController>(
+            //    new TransientLifetimeManager());
 
             m_Container.RegisterType<OptionsStore>(
                 new ContainerControlledLifetimeManager());

@@ -27,8 +27,8 @@ namespace Sw.Tests
 
             //TestDisplayOnBody(transform, "Data\\t5.sldprt", "Boss-Extrude2");
 
-            Assert.IsTrue(transform.Translation.ToArray().AreEqualItemWise(new double[] { 0, 0, 0 }, comp));
-            Assert.IsTrue(transform.Rotation.ToArray().AreEqualItemWise(new double[] { 1, 0, 0, 0, 0, -1, 0, 1, 0 }, comp));
+            Assert.IsTrue(transform.Translation.ToArray().SequenceEqual(new double[] { 0, 0, 0 }, comp));
+            Assert.IsTrue(transform.Rotation.ToArray().SequenceEqual(new double[] { 1, 0, 0, 0, 0, -1, 0, 1, 0 }, comp));
             Assert.AreEqual(1, transform.Scale);
         }
 
@@ -50,9 +50,9 @@ namespace Sw.Tests
                 Debug.Print(d.ToString());
             }
 
-            Assert.IsTrue(transform.Translation.ToArray().AreEqualItemWise(new double[] { 0, 0, 0 }, comp));
+            Assert.IsTrue(transform.Translation.ToArray().SequenceEqual(new double[] { 0, 0, 0 }, comp));
 
-            Assert.IsTrue(transform.Rotation.ToArray().AreEqualItemWise(new double[]
+            Assert.IsTrue(transform.Rotation.ToArray().SequenceEqual(new double[]
             {
                 -0.356591604687574, -0.860646213105648, -0.363497624934811,
                 0.860646213105648, -0.45399049973947, 0.230609457770521,
@@ -92,12 +92,12 @@ namespace Sw.Tests
 
             //TestDisplayOnBody(transform, "Data\\t2.sldprt", "Body-Move/Copy2", ptsTransf);
 
-            Assert.IsTrue(ptsTransf[0].ToArray().AreEqualItemWise(new double[] { 0.100347458065948, 0.0734851335523633, 0.0326166720106647 }, comp));
-            Assert.IsTrue(ptsTransf[1].ToArray().AreEqualItemWise(new double[] { 0.159477495676095, -0.0525148664476371, 0.0813709089599175 }, comp));
-            Assert.IsTrue(ptsTransf[2].ToArray().AreEqualItemWise(new double[] { 0.140667578609346, 0.0734851335523624, 0.0813050851309728 }, comp));
-            Assert.IsTrue(ptsTransf[3].ToArray().AreEqualItemWise(new double[] { 0.146570986957314, -0.0525148664476372, 0.092059119028498 }, comp));
-            Assert.IsTrue(ptsTransf[4].ToArray().AreEqualItemWise(new double[] { 0.112114520796401, 0.073485133552363, 0.082505342603813 }, comp));
-            Assert.IsTrue(ptsTransf[5].ToArray().AreEqualItemWise(new double[] { 0.143225221928054, -0.0525148664476371, 0.0124663445857203 }, comp));
+            Assert.IsTrue(ptsTransf[0].ToArray().SequenceEqual(new double[] { 0.100347458065948, 0.0734851335523633, 0.0326166720106647 }, comp));
+            Assert.IsTrue(ptsTransf[1].ToArray().SequenceEqual(new double[] { 0.159477495676095, -0.0525148664476371, 0.0813709089599175 }, comp));
+            Assert.IsTrue(ptsTransf[2].ToArray().SequenceEqual(new double[] { 0.140667578609346, 0.0734851335523624, 0.0813050851309728 }, comp));
+            Assert.IsTrue(ptsTransf[3].ToArray().SequenceEqual(new double[] { 0.146570986957314, -0.0525148664476372, 0.092059119028498 }, comp));
+            Assert.IsTrue(ptsTransf[4].ToArray().SequenceEqual(new double[] { 0.112114520796401, 0.073485133552363, 0.082505342603813 }, comp));
+            Assert.IsTrue(ptsTransf[5].ToArray().SequenceEqual(new double[] { 0.143225221928054, -0.0525148664476371, 0.0124663445857203 }, comp));
         }
 
         private void TestDisplayOnBody(TransformationMaxtrix transform, string fileName, string bodyName, 

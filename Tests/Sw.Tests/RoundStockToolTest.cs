@@ -98,9 +98,10 @@ namespace Sw.Tests
         private IBody2 CreateCylindricalStock(IModelDoc2 model, object inputObj,
             bool concentric = false)
         {
-            CylinderParams cylParams;
-            var tempBody = m_StockModel.CreateCylindricalStock(model as IPartDoc, 
-                inputObj, concentric, 0, out cylParams);
+            var cylParams = m_StockModel.GetCylinderParameters(model as IPartDoc,
+                inputObj, concentric, 0);
+
+            var tempBody = m_StockModel.CreateCylindricalStock(cylParams);
 
             return tempBody;
         }
