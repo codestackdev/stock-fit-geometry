@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xarial.AppLaunchKit.Base.Services;
 
 namespace CodeStack.Community.StockFit.MVC
 {
@@ -23,11 +24,16 @@ namespace CodeStack.Community.StockFit.MVC
         private readonly IModeler m_Modeler;
         private readonly CylindricalStockFitExtractor m_CylExt;
 
-        public RoundStockModel(ISldWorks app, CylindricalStockFitExtractor cylExt)
+        private readonly ILogService m_Log;
+
+        public RoundStockModel(ISldWorks app, CylindricalStockFitExtractor cylExt, ILogService log)
         {
             m_App = app;
             m_Modeler = app.IGetModeler();
             m_CylExt = cylExt;
+            m_Log = log;
+
+            m_Log.LogMessage("Initialized round stock model");
         }
 
         public IBody2 CreateCylindricalStock(CylinderParams cylParams)
@@ -98,27 +104,6 @@ namespace CodeStack.Community.StockFit.MVC
                 GC.Collect();
             }
         }
-
-        //private IBody2 CreateBody(RoundStockFeatureParameters par, out Exception err)
-        //{
-        //    err = null;
-
-        //    try
-        //    {
-        //        CreateCylindricalStock()
-        //        CylinderParams cylParams;
-        //        var step = m_Setts.StockSteps.FirstOrDefault(s => s.Key == par.StockStep).Value;
-
-        //        return m_StockTool.CreateCylindricalStock(m_Part, par.Direction,
-        //            par.ConcenticWithCylindricalFace, step, out cylParams);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        err = ex;
-
-        //        return null;
-        //    }
-        //}
 
         public IBody2 GetScopeBody(IPartDoc part, object inputObj)
         {

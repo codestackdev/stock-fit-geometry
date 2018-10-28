@@ -59,5 +59,43 @@ namespace CodeStack.Community.StockFit.Sw.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stock Master.
+        /// </summary>
+        internal static string AppTitle {
+            get {
+                return ResourceManager.GetString("AppTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon round_stock_dlg_icon {
+            get {
+                object obj = ResourceManager.GetObject("round_stock_dlg_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap round_stock_icon {
+            get {
+                object obj = ResourceManager.GetObject("round_stock_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CodeStack\StockMaster.
+        /// </summary>
+        internal static string WorkDir {
+            get {
+                return ResourceManager.GetString("WorkDir", resourceCulture);
+            }
+        }
     }
 }

@@ -1,10 +1,11 @@
-﻿using System.Reflection;
+﻿using CodeStack.Community.StockFit.Sw.Properties;
+using SolidWorks.Interop.sldworks;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Xarial.AppLaunchKit.Attributes;
+using Xarial.AppLaunchKit.Services.Attributes;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
 [assembly: AssemblyTitle("Sw")]
 [assembly: AssemblyDescription("SOLIDWORKS add-in to generate best-fit round stock for solid bodies")]
 [assembly: AssemblyConfiguration("")]
@@ -14,25 +15,20 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("bf046003-0d5b-4930-9dce-b6eee9727340")]
 
 [assembly: InternalsVisibleTo("Sw.Tests")]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.0.2.0")]
-[assembly: AssemblyFileVersion("0.0.2.0")]
+[assembly: AssemblyVersion("0.5.0.0")]
+[assembly: AssemblyFileVersion("0.5.0.0")]
+
+//[assembly: UpdatesUrl(typeof(UpdatesServerMock), nameof(UpdatesServerMock.UpdateUrl))]
+
+[assembly: Log("CodeStack", "StockMaster", true, false)]
+//[assembly: UserSettings("Settings", false, typeof(CustomUserSettingsBackwardCompatibility))]
+[assembly: About(typeof(Resources), nameof(Resources.round_stock_icon))]
+
+[assembly: ApplicationInfo(typeof(Resources), System.Environment.SpecialFolder.ApplicationData,
+    nameof(Resources.WorkDir), nameof(Resources.AppTitle), nameof(Resources.round_stock_dlg_icon))]

@@ -23,6 +23,13 @@ using Unity;
 using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Resolution;
+using Xarial.AppLaunchKit;
+using Xarial.AppLaunchKit.Base.Services;
+using Xarial.AppLaunchKit.Services.About;
+using Xarial.AppLaunchKit.Services.External;
+using Xarial.AppLaunchKit.Services.Logger;
+using Xarial.AppLaunchKit.Services.Updates;
+using Xarial.AppLaunchKit.Services.UserSettings;
 
 namespace CodeStack.Community.StockFit.Sw
 {
@@ -38,6 +45,8 @@ namespace CodeStack.Community.StockFit.Sw
             get;
             private set;
         }
+
+        private ServicesManager m_Kit;
 
         public ServicesContainer(ISldWorks app)
         {
@@ -57,18 +66,38 @@ namespace CodeStack.Community.StockFit.Sw
             m_Container.RegisterType<IVectorMathService, SwVectorMathService>(
                 new ContainerControlledLifetimeManager());
 
-            //m_Container.RegisterType<RoundStockView>(
-            //    new TransientLifetimeManager());
-
             m_Container.RegisterType<RoundStockController>(
                 new ContainerControlledLifetimeManager());
 
             m_Container.RegisterType<OptionsStore>(
                 new ContainerControlledLifetimeManager());
 
-            var setts = m_Container.Resolve<RoundStockFeatureSettings>();
+            m_Kit = new ServicesManager(this.GetType().Assembly, new IntPtr(app.IFrameObject().GetHWnd()),
+                //typeof(UpdatesService),
+                //typeof(UserSettingsService),
+                //typeof(ExternalProcessService),
+                typeof(SystemEventLogService),
+                typeof(AboutApplicationService));
 
-            m_Container.RegisterInstance(setts);
+            m_Kit.HandleError += OnHandleError;
+            m_Kit.StartServices();
+
+            m_Container.RegisterInstance(m_Kit.GetService<ILogService>());
+            //m_Container.RegisterInstance(m_Kit.GetService<IUserSettingsService>());
+            m_Container.RegisterInstance(m_Kit.GetService<IAboutApplicationService>());
+        }
+
+        private bool OnHandleError(Exception ex)
+        {
+            try
+            {
+                m_Kit.GetService<ILogService>().LogException(ex);
+            }
+            catch
+            {
+            }
+
+            return true;
         }
 
         internal TService GetService<TService>()

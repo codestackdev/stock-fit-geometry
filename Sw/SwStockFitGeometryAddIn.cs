@@ -6,8 +6,8 @@
 
 using CodeStack.Community.StockFit.Sw.MVC;
 using CodeStack.Community.StockFit.Sw.Options;
+using CodeStack.Community.StockFit.Sw.Properties;
 using CodeStack.Community.StockFit.Sw.Services;
-using CodeStack.Community.StockFit.Sw.UI;
 using CodeStack.SwEx.AddIn;
 using CodeStack.SwEx.AddIn.Attributes;
 using CodeStack.SwEx.AddIn.Enums;
@@ -17,6 +17,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Xarial.AppLaunchKit.Base.Services;
 
 namespace CodeStack.Community.StockFit.Sw
 {
@@ -30,11 +31,13 @@ namespace CodeStack.Community.StockFit.Sw
         
         [Title("Stock Master")]
         [Description("Stock Master")]
+        [Icon(typeof(Resources), nameof(Resources.round_stock_icon))]
         private enum Commands_e
         {
             [Title("Create Stock Feature")]
             [Description("Creates Stock Feature")]
             [CommandItemInfo(true, true, swWorkspaceTypes_e.Part)]
+            [Icon(typeof(Resources), nameof(Resources.round_stock_icon))]
             CreateStockFeature,
 
             [Title("About...")]
@@ -51,16 +54,37 @@ namespace CodeStack.Community.StockFit.Sw
 
         public override bool OnConnect()
         {
-            m_Container = new ServicesContainer(m_App);
+            try
+            {
+                AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+                m_Container = new ServicesContainer(m_App);
 
-            m_OptsStore = m_Container.GetService<OptionsStore>();
+                m_OptsStore = m_Container.GetService<OptionsStore>();
 
-            m_Controller = m_Container.GetService<RoundStockController>();
-            m_Controller.FeatureInsertionCompleted += OnFeatureInsertionCompleted;
+                m_Controller = m_Container.GetService<RoundStockController>();
+                m_Controller.FeatureInsertionCompleted += OnFeatureInsertionCompleted;
 
-            AddCommandGroup<Commands_e>(OnCommandClick);
+                AddCommandGroup<Commands_e>(OnCommandClick);
 
-            return true;
+                return true;
+            }
+            catch(Exception ex)
+            {
+                try
+                {
+                    m_Container.GetService<ILogService>().LogException(ex);
+                }
+                catch
+                {
+                }
+
+                return false;
+            }
+        }
+
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            m_Container.GetService<ILogService>().LogException(e.ExceptionObject as Exception);
         }
 
         private void OnFeatureInsertionCompleted(RoundStockFeatureParameters parameters, IPartDoc part, bool isOk)
@@ -99,8 +123,9 @@ namespace CodeStack.Community.StockFit.Sw
                     break;
 
                 case Commands_e.About:
-                    var aboutForm = new AboutForm();
-                    aboutForm.ShowDialog();
+                    m_Container.GetService<IAboutApplicationService>().ShowAboutForm();
+                    //var aboutForm = new AboutForm();
+                    //aboutForm.ShowDialog();
                     break;
             }
         }
