@@ -18,28 +18,54 @@ using System.Text;
 using CodeStack.Community.StockFit.MVC;
 using CodeStack.SwEx.MacroFeature.Data;
 using CodeStack.SwEx.MacroFeature.Base;
+using CodeStack.SwEx.MacroFeature.Attributes;
+using CodeStack.Community.StockFit.Sw.MVC;
 
 namespace CodeStack.Community.StockFit.Sw
 {
     [ComVisible(true)]
     [Guid("47827004-8897-49F5-9C65-5B845DC7F5AC")]
     [ProgId(Id)]
+    [Options("CodeStack.RoundStock", swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd)]
     public class RoundStockMacroFeature : MacroFeatureEx<RoundStockFeatureParameters>
     {
         public const string Id = "CodeStack.StockMacroFeature";
 
         private readonly RoundStockModel m_StockModel;
         private readonly RoundStockFeatureSettings m_Setts;
+        private readonly RoundStockController m_Controller;
 
         public RoundStockMacroFeature() : base()
         {
             m_StockModel = ServicesContainer.Instance.GetService<RoundStockModel>();
             m_Setts = ServicesContainer.Instance.GetService<RoundStockFeatureSettings>();
+            m_Controller = ServicesContainer.Instance.GetService<RoundStockController>();
+
+            m_Controller.FeatureEditingCompleted += OnFeatureEditingCompleted;
+        }
+
+        private void OnFeatureEditingCompleted(RoundStockFeatureParameters parameters, IPartDoc part, IFeature feat, bool isOk)
+        {
+            if (isOk)
+            {
+                var featData = feat.GetDefinition() as IMacroFeatureData;
+                SetParameters(featData, parameters);
+
+                feat.ModifyDefinition(featData, part, null);
+            }
+            else
+            {
+                (feat.GetDefinition() as IMacroFeatureData).ReleaseSelectionAccess();
+            }
         }
 
         protected override bool OnEditDefinition(ISldWorks app, IModelDoc2 model, IFeature feature)
         {
-            return base.OnEditDefinition(app, model, feature);
+            (feature.GetDefinition() as IMacroFeatureData).AccessSelections(model, null);
+
+            m_Controller.ShowPage(GetParameters(feature.GetDefinition() as IMacroFeatureData), model as IPartDoc, feature);
+
+            return true;
         }
 
         protected override MacroFeatureRebuildResult OnRebuild(ISldWorks app, IModelDoc2 model,
@@ -52,6 +78,11 @@ namespace CodeStack.Community.StockFit.Sw
             //temp
             SetProperties(model, parameters, cylParams);
             //
+
+            parameters.Height = cylParams.Height;
+            parameters.Radius = cylParams.Radius;
+
+            SetParameters(feature.GetDefinition() as IMacroFeatureData, parameters);
 
             return MacroFeatureRebuildResult.FromBody(body, feature.GetDefinition() as IMacroFeatureData);
         }
@@ -79,9 +110,15 @@ namespace CodeStack.Community.StockFit.Sw
                 diamDir = yVec.Cross(heightDir);
             }
 
-            dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.SetDirection(endPt, diamDir, cylParams.Radius);
+            var diamExtVec = diamDir.Cross(heightDir);
+
+            dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.SetDirection(endPt, diamDir, cylParams.Radius, diamExtVec);
+            dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
+            dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.ReadOnly = true;
 
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.SetDirection(startPt, heightDir, cylParams.Height);
+            dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
+            dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.ReadOnly = true;
         }
 
         private CylinderParams GetCylinderParams(IModelDoc2 model,

@@ -96,6 +96,10 @@
       <HintPath>..\packages\Unity.5.8.6\lib\net40\Unity.ServiceLocation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Xarial.VPages.Framework, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\vpages-sw-dev\Base\bin\Debug\Xarial.VPages.Framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extension\ModelDocExtension.cs" />
@@ -112,11 +116,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Reflection\EnumDisplayNameAttribute.cs" />
-    <Compile Include="Reflection\EnumExtension.cs" />
+    <None Include="Reflection\EnumDisplayNameAttribute.cs" />
+    <None Include="Reflection\EnumExtension.cs" />
     <Compile Include="Options\RoundStockFeatureParameters.cs" />
     <Compile Include="Options\RoundStockFeatureSettings.cs" />
-    <Compile Include="Reflection\MemberInfoExtension.cs" />
+    <None Include="Reflection\MemberInfoExtension.cs" />
     <Compile Include="RoundStockMacroFeature.cs" />
     <Compile Include="ServicesContainer.cs" />
     <Compile Include="Services\OptionsStore.cs" />

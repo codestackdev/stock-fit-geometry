@@ -42,9 +42,9 @@ namespace CodeStack.Community.StockFit.Sw.Math
         public TransformationMaxtrix GetTransformBetweenVectorsAroundPoint(
             Vector firstVector, Vector secondVector, Point point)
         {
-            IMathVector mathVec1 = m_MathUtils.CreateVector(firstVector.ToArray()) as IMathVector;
-            IMathVector mathVec2 = m_MathUtils.CreateVector(secondVector.ToArray()) as IMathVector;
-            IMathVector crossVec = mathVec1.Cross(mathVec2) as IMathVector;
+            IMathVector mathVec1 = (m_MathUtils.CreateVector(firstVector.ToArray()) as IMathVector).Normalise();
+            IMathVector mathVec2 = (m_MathUtils.CreateVector(secondVector.ToArray()) as IMathVector).Normalise();
+            IMathVector crossVec = (mathVec1.Cross(mathVec2) as IMathVector).Normalise();
 
             double dot = mathVec1.Dot(mathVec2);
             double vec1Len = mathVec1.GetLength();

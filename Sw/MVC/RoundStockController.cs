@@ -28,26 +28,125 @@ namespace CodeStack.Community.StockFit.Sw.MVC
         private PropertyManagerPageEx<RoundStockViewHandler, RoundStockFeatureParameters> m_ActivePage;
 
         private readonly ISldWorks m_App;
+        private readonly RoundStockModel m_Model;
+        private readonly RoundStockFeatureSettings m_Setts;
+        private readonly OptionsStore m_OptsStore;
 
-        public RoundStockController(ISldWorks app)
+        private IPartDoc m_CurrentPart;
+        private RoundStockFeatureParameters m_CurrentParameters;
+        private IFeature m_EditingFeature;
+
+        public event Action<RoundStockFeatureParameters, IPartDoc, IFeature, bool> FeatureEditingCompleted;
+        public event Action<RoundStockFeatureParameters, IPartDoc, bool> FeatureInsertionCompleted;
+
+        public RoundStockController(ISldWorks app, RoundStockModel model, 
+            RoundStockFeatureSettings setts, OptionsStore opts)
         {
             m_App = app;
+            m_Model = model;
+            m_Setts = setts;
+            m_OptsStore = opts;
         }
 
-        public void ShowPage(RoundStockFeatureParameters parameters)
+        public void ShowPage(RoundStockFeatureParameters parameters, IPartDoc part, IFeature editingFeature)
         {
+            m_CurrentParameters = parameters;
+            m_CurrentPart = part;
+            m_EditingFeature = editingFeature;
+            
             if (m_ActivePage != null)
             {
-                m_ActivePage.Handler.Closed += OnClosed;
+                m_ActivePage.Handler.DataChanged -= OnDataChanged;
+                m_ActivePage.Handler.Closing -= OnPageClosing;
+                m_ActivePage.Handler.Closed -= OnClosed;
             }
 
             m_ActivePage = new PropertyManagerPageEx<RoundStockViewHandler, RoundStockFeatureParameters>(
                 parameters, m_App);
+
+            m_ActivePage.Handler.DataChanged += OnDataChanged;
+            m_ActivePage.Handler.Closing += OnPageClosing;
+            m_ActivePage.Handler.Closed += OnClosed;
+
+            m_ActivePage.Show();
+
+            var step = m_Setts.StockSteps.FirstOrDefault(s => s.Key == m_CurrentParameters.StockStep).Value;
+
+            m_Model.ShowPreview(part, parameters.Direction, parameters.ConcenticWithCylindricalFace, step);
+        }
+
+        private void OnDataChanged()
+        {
+            var step = m_Setts.StockSteps.FirstOrDefault(s => s.Key == m_CurrentParameters.StockStep).Value;
+
+            m_Model.ShowPreview(m_CurrentPart, m_CurrentParameters.Direction,
+                m_CurrentParameters.ConcenticWithCylindricalFace, step);
+        }
+
+        private void OnPageClosing(swPropertyManagerPageCloseReasons_e reason, SwEx.PMPage.Base.ClosingArg arg)
+        {
+            if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
+            {
+                IBody2 body = null;
+
+                Exception err = null;
+
+                try
+                {
+                    var step = m_Setts.StockSteps.FirstOrDefault(s => s.Key == m_CurrentParameters.StockStep).Value;
+                    var cylParams = m_Model.GetCylinderParameters(m_CurrentPart, m_CurrentParameters.Direction,
+                        m_CurrentParameters.ConcenticWithCylindricalFace, step);
+
+                    body = m_Model.CreateCylindricalStock(cylParams);
+                }
+                catch(Exception ex)
+                {
+                    err = ex;
+                }
+                
+                if (body == null)
+                {
+                    arg.Cancel = true;
+                    arg.ErrorTitle = "Cylindrical Stock Error";
+                    arg.ErrorMessage = err?.Message;
+                }
+            }
         }
 
         private void OnClosed(swPropertyManagerPageCloseReasons_e reason)
         {
-            throw new NotImplementedException();
+            m_Model.HidePreview(m_CurrentPart);
+
+            var isOk = reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay;
+
+            if (isOk)
+            {
+                m_CurrentParameters.ScopeBody = m_Model.GetScopeBody(
+                    m_CurrentPart, m_CurrentParameters.Direction);
+
+                m_OptsStore.Save(m_CurrentParameters);
+            }
+
+            if (m_EditingFeature != null)
+            {
+                //var featData = m_EditingFeature.GetDefinition() as IMacroFeatureData;
+
+                ////featData.SerializeParameters(par);
+
+                //var modRes = m_EditingFeature.ModifyDefinition(featData, m_CurrentPart as IModelDoc2, null);
+
+                //Debug.Assert(modRes);
+
+                FeatureEditingCompleted?.Invoke(m_CurrentParameters, m_CurrentPart, m_EditingFeature,
+                    isOk);
+            }
+            else
+            {
+                FeatureInsertionCompleted?.Invoke(m_CurrentParameters, m_CurrentPart, isOk);
+            }
+
+            m_EditingFeature = null;
+            m_CurrentPart = null;
         }
     }
     /// <summary>

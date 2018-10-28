@@ -4,13 +4,18 @@
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
+using CodeStack.Community.StockFit.Sw.MVC;
+using CodeStack.Community.StockFit.Sw.Options;
+using CodeStack.Community.StockFit.Sw.Services;
 using CodeStack.Community.StockFit.Sw.UI;
 using CodeStack.SwEx.AddIn;
 using CodeStack.SwEx.AddIn.Attributes;
 using CodeStack.SwEx.AddIn.Enums;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace CodeStack.Community.StockFit.Sw
@@ -40,21 +45,57 @@ namespace CodeStack.Community.StockFit.Sw
 
         private ServicesContainer m_Container;
 
+        private RoundStockController m_Controller;
+
+        private OptionsStore m_OptsStore;
+
         public override bool OnConnect()
         {
             m_Container = new ServicesContainer(m_App);
 
+            m_OptsStore = m_Container.GetService<OptionsStore>();
+
+            m_Controller = m_Container.GetService<RoundStockController>();
+            m_Controller.FeatureInsertionCompleted += OnFeatureInsertionCompleted;
+
             AddCommandGroup<Commands_e>(OnCommandClick);
+
             return true;
         }
-        
+
+        private void OnFeatureInsertionCompleted(RoundStockFeatureParameters parameters, IPartDoc part, bool isOk)
+        {
+            if (isOk)
+            {
+                var feat = (part as IModelDoc2).FeatureManager
+                    .InsertComFeature<RoundStockMacroFeature, RoundStockFeatureParameters>(parameters);
+
+                Debug.Assert(feat != null);
+
+                //swpuc only
+                if (feat != null)
+                {
+                    int index = 1;
+                    var featNameBase = $"Stock Block Round for config {(part as IModelDoc2).IGetActiveConfiguration().Name}";
+                    var featName = featNameBase;
+                    while ((part as IModelDoc2).FeatureManager.IsNameUsed(
+                        (int)swNameType_e.swFeatureName, featName))
+                    {
+                        featName = featNameBase + index++;
+                    }
+
+                    feat.Name = featName;
+                }
+            }
+        }
+
         private void OnCommandClick(Commands_e cmd)
         {
             switch (cmd)
             {
                 case Commands_e.CreateStockFeature:
-                    //var ctrl = m_Container.GetService<RoundStockController>();
-                    //ctrl.Process(m_App.IActiveDoc2 as IPartDoc);
+                    var par = m_OptsStore.Load<RoundStockFeatureParameters>();
+                    m_Controller.ShowPage(par, m_App.IActiveDoc2 as IPartDoc, null);
                     break;
 
                 case Commands_e.About:

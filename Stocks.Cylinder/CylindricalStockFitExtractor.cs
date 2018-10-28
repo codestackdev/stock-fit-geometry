@@ -130,8 +130,7 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
                 Point endPt;
 
                 GetExtremePointsAligned(geom, vec, alignTransform, out startPt, out endPt);
-
-
+                
                 perPoints.Add(startPt);
                 perPoints.Add(endPt);
             }

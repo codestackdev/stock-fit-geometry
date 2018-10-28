@@ -7,6 +7,7 @@
 using CodeStack.Community.StockFit.Base.Math.Structures;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw;
+using CodeStack.Community.StockFit.Sw.Options;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -60,19 +61,66 @@ namespace CodeStack.Community.StockFit.MVC
             return cylParams;
         }
 
-        //private IBody2 CreateCylindricalBody(IPartDoc part, CylinderParams cylParams)
-        //{
-        //    var cylTempBody = m_App.IGetModeler().CreateBodyFromCyl(new double[]
-        //            {
-        //                cylParams.Origin.X, cylParams.Origin.Y, cylParams.Origin.Z,
-        //                cylParams.Axis.X, cylParams.Axis.Y, cylParams.Axis.Z,
-        //                cylParams.Radius, cylParams.Height
-        //            }) as IBody2;
+        private IBody2 m_TempBody;
 
-        //    return cylTempBody;
+        public void ShowPreview(IPartDoc part, object inputObj, bool concentric, double step)
+        {
+            HidePreview(part);
+
+            try
+            {
+                var cylParams = GetCylinderParameters(part, inputObj, concentric, step);
+                m_TempBody = CreateCylindricalStock(cylParams);
+            }
+            catch
+            {
+            }
+
+            if (m_TempBody != null)
+            {
+                const int COLORREF_YELLOW = 65535;
+
+                m_TempBody.Display3(part, COLORREF_YELLOW,
+                    (int)swTempBodySelectOptions_e.swTempBodySelectOptionNone);
+
+                m_TempBody.MaterialPropertyValues2 = new double[] { 1, 1, 0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
+
+                (part as IModelDoc2).GraphicsRedraw2();
+            }
+        }
+
+        public void HidePreview(IPartDoc part)
+        {
+            if (m_TempBody != null)
+            {
+                m_TempBody.Hide(part);
+                m_TempBody = null;
+                GC.Collect();
+            }
+        }
+
+        //private IBody2 CreateBody(RoundStockFeatureParameters par, out Exception err)
+        //{
+        //    err = null;
+
+        //    try
+        //    {
+        //        CreateCylindricalStock()
+        //        CylinderParams cylParams;
+        //        var step = m_Setts.StockSteps.FirstOrDefault(s => s.Key == par.StockStep).Value;
+
+        //        return m_StockTool.CreateCylindricalStock(m_Part, par.Direction,
+        //            par.ConcenticWithCylindricalFace, step, out cylParams);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        err = ex;
+
+        //        return null;
+        //    }
         //}
 
-        private IBody2 GetScopeBody(IPartDoc part, object inputObj)
+        public IBody2 GetScopeBody(IPartDoc part, object inputObj)
         {
             if (inputObj is IFace2)
             {
