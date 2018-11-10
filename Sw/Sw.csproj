@@ -34,17 +34,20 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CodeStack.SwEx.AddIn">
-      <HintPath>..\..\sw-dev-tools-addin-dev\Framework\bin\Debug\CodeStack.SwEx.AddIn.dll</HintPath>
+    <Reference Include="CodeStack.SwEx.AddIn, Version=0.3.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.AddIn.0.3.0\lib\net40\CodeStack.SwEx.AddIn.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="CodeStack.SwEx.Common">
-      <HintPath>..\..\swex-common-dev\Base\bin\Debug\CodeStack.SwEx.Common.dll</HintPath>
+    <Reference Include="CodeStack.SwEx.Common, Version=0.9.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.Common.0.9.0\lib\net40\CodeStack.SwEx.Common.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="CodeStack.SwEx.MacroFeature">
-      <HintPath>..\..\swex-macrofeature-dev\Base\bin\Debug\CodeStack.SwEx.MacroFeature.dll</HintPath>
+    <Reference Include="CodeStack.SwEx.MacroFeature, Version=0.1.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.MacroFeature.0.1.0-alpha\lib\net40\CodeStack.SwEx.MacroFeature.dll</HintPath>
     </Reference>
-    <Reference Include="CodeStack.SwEx.PMPage">
-      <HintPath>..\..\vpages-sw-dev\Base\bin\Debug\CodeStack.SwEx.PMPage.dll</HintPath>
+    <Reference Include="CodeStack.SwEx.PMPage, Version=0.4.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.PMPage.0.4.0\lib\net40\CodeStack.SwEx.PMPage.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.5.8.6\lib\net40\CommonServiceLocator.dll</HintPath>
@@ -54,24 +57,21 @@
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SolidWorks.Interop.sldworks, Version=22.5.0.77, Culture=neutral, PublicKeyToken=7c4797c3e4eeac03, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="SolidWorks.Interop.sldworks, Version=26.2.0.63, Culture=neutral, PublicKeyToken=7c4797c3e4eeac03, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.Common.0.9.0\lib\net40\SolidWorks.Interop.sldworks.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\swex-common-dev\thirdpty\SolidWorks.Interop.sldworks.dll</HintPath>
     </Reference>
-    <Reference Include="SolidWorks.Interop.swconst, Version=22.5.0.77, Culture=neutral, PublicKeyToken=19f43e188e4269d8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="SolidWorks.Interop.swconst, Version=26.2.0.63, Culture=neutral, PublicKeyToken=19f43e188e4269d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.Common.0.9.0\lib\net40\SolidWorks.Interop.swconst.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\swex-common-dev\thirdpty\SolidWorks.Interop.swconst.dll</HintPath>
     </Reference>
-    <Reference Include="SolidWorks.Interop.swpublished, Version=22.5.0.77, Culture=neutral, PublicKeyToken=89a97bdc5284e6d8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="SolidWorks.Interop.swpublished, Version=26.2.0.63, Culture=neutral, PublicKeyToken=89a97bdc5284e6d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.Common.0.9.0\lib\net40\SolidWorks.Interop.swpublished.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\swex-common-dev\thirdpty\SolidWorks.Interop.swpublished.dll</HintPath>
     </Reference>
     <Reference Include="SolidWorksTools, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bd18593873b4686d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\swex-common-dev\thirdpty\SolidWorksTools.dll</HintPath>
+      <HintPath>..\packages\CodeStack.SwEx.Common.0.9.0\lib\net40\SolidWorksTools.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -99,15 +99,17 @@
       <HintPath>..\packages\Unity.5.8.6\lib\net40\Unity.ServiceLocation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Xarial.Signal2Go">
-      <HintPath>..\..\signal-2-go-dev\Core\bin\Debug\Xarial.Signal2Go.dll</HintPath>
+    <Reference Include="Xarial.Signal2Go, Version=0.2.0.0, Culture=neutral, PublicKeyToken=6dcec729ca6a1943, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xarial.Signal2Go.0.2.0\lib\net461\Xarial.Signal2Go.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Xarial.Signal2Go.Services.UserSettings">
-      <HintPath>..\..\signal-2-go-dev\Services\UserSettings\bin\Debug\Xarial.Signal2Go.Services.UserSettings.dll</HintPath>
+    <Reference Include="Xarial.Signal2Go.Services.UserSettings, Version=0.2.0.0, Culture=neutral, PublicKeyToken=6dcec729ca6a1943, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xarial.Signal2Go.Services.UserSettings.0.2.0\lib\net461\Xarial.Signal2Go.Services.UserSettings.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Xarial.VPages.Framework, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\vpages-sw-dev\Base\bin\Debug\Xarial.VPages.Framework.dll</HintPath>
+    <Reference Include="Xarial.VPages.Framework, Version=0.3.0.0, Culture=neutral, PublicKeyToken=6dcec729ca6a1943, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xarial.VPages.Framework.0.3.0\lib\net40\Xarial.VPages.Framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

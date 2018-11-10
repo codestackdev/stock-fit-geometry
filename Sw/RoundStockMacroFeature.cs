@@ -88,9 +88,7 @@ namespace CodeStack.Community.StockFit.Sw
             IFeature feature, RoundStockFeatureParameters parameters)
         {
             var cylParams = GetCylinderParams(model, parameters);
-
-            var body = m_StockModel.CreateCylindricalStock(cylParams);
-
+            
             //temp
             SetProperties(model, parameters, cylParams);
             //
@@ -100,7 +98,15 @@ namespace CodeStack.Community.StockFit.Sw
 
             SetParameters(feature.GetDefinition() as IMacroFeatureData, parameters);
 
-            return MacroFeatureRebuildResult.FromBody(body, feature.GetDefinition() as IMacroFeatureData);
+            if (parameters.CreateSolidBody)
+            {
+                var body = m_StockModel.CreateCylindricalStock(cylParams);
+                return MacroFeatureRebuildResult.FromBody(body, feature.GetDefinition() as IMacroFeatureData);
+            }
+            else
+            {
+                return MacroFeatureRebuildResult.FromStatus(true);
+            }
         }
 
         protected override void OnSetDimensions(ISldWorks app, IModelDoc2 model, IFeature feature,
