@@ -119,7 +119,7 @@ namespace CodeStack.Community.StockFit.Sw
             var startPt = new Point(cylParams.Origin.ToArray());
             var heightDir = new Vector(cylParams.Axis.ToArray());
             var endPt = startPt.Move(heightDir, cylParams.Height);
-
+            
             Vector diamDir = null;
 
             var yVec = new Vector(0, 1, 0);
@@ -132,6 +132,8 @@ namespace CodeStack.Community.StockFit.Sw
                 diamDir = yVec.Cross(heightDir);
             }
 
+            var startExtraDiamPt = endPt.Move(diamDir, cylParams.Radius - parameters.ExtraRadius);
+
             var diamExtVec = diamDir.Cross(heightDir);
 
             dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.SetDirection(endPt, diamDir, cylParams.Radius, diamExtVec);
@@ -141,13 +143,16 @@ namespace CodeStack.Community.StockFit.Sw
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.SetDirection(startPt, heightDir, cylParams.Height);
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.ReadOnly = true;
+
+            dims[(int)RoundStockFeatureDimensions_e.ExtaRadius].Dimension.SetDirection(
+                startExtraDiamPt, diamDir, parameters.ExtraRadius);
         }
 
         private CylinderParams GetCylinderParams(IModelDoc2 model,
             RoundStockFeatureParameters parameters)
         {
             var cylParams = m_StockModel.GetCylinderParameters(model as IPartDoc, parameters.Direction,
-                parameters.ConcenticWithCylindricalFace, parameters.StockStep);
+                parameters.ConcenticWithCylindricalFace, parameters.StockStep, parameters.ExtraRadius);
 
             return cylParams;
         }

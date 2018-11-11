@@ -22,7 +22,8 @@ namespace CodeStack.Community.StockFit.Sw.Options
     public enum RoundStockFeatureDimensions_e
     {
         Radius = 0,
-        Height = 1
+        Height = 1,
+        ExtaRadius = 2
     }
 
     public class RoundStockFeatureParameters
@@ -46,5 +47,8 @@ namespace CodeStack.Community.StockFit.Sw.Options
         [ParameterDimension(swDimensionType_e.swLinearDimension, (int)RoundStockFeatureDimensions_e.Height)]
         [IgnoreDataMember, XmlIgnore, JsonIgnore]
         public double Height { get; set; }
+
+        [ParameterDimension(swDimensionType_e.swLinearDimension, (int)RoundStockFeatureDimensions_e.ExtaRadius)]
+        public double ExtraRadius { get; set; }
     }
 }

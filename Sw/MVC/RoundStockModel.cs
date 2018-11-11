@@ -43,7 +43,7 @@ namespace CodeStack.Community.StockFit.MVC
                 cylParams.Radius, cylParams.Height);
         }
 
-        public CylinderParams GetCylinderParameters(IPartDoc part, object inputObj, bool concentric, double step)
+        public CylinderParams GetCylinderParameters(IPartDoc part, object inputObj, bool concentric, double step, double extraRadius)
         {
             CylinderParams cylParams;
             var body = GetScopeBody(part, inputObj);
@@ -51,6 +51,8 @@ namespace CodeStack.Community.StockFit.MVC
             var dir = GetDirection(inputObj);
 
             cylParams = m_CylExt.GetStockParameters(new SolidBodyGeometry(body), dir);
+
+            cylParams.Radius = cylParams.Radius + extraRadius;
 
             if (concentric && (inputObj is IFace2) && (inputObj as IFace2).IGetSurface().IsCylinder())
             {
@@ -69,13 +71,13 @@ namespace CodeStack.Community.StockFit.MVC
 
         private IBody2 m_TempBody;
 
-        public void ShowPreview(IPartDoc part, object inputObj, bool concentric, double step)
+        public void ShowPreview(IPartDoc part, object inputObj, bool concentric, double step, double extraRadius)
         {
             HidePreview(part);
 
             try
             {
-                var cylParams = GetCylinderParameters(part, inputObj, concentric, step);
+                var cylParams = GetCylinderParameters(part, inputObj, concentric, step, extraRadius);
                 m_TempBody = CreateCylindricalStock(cylParams);
             }
             catch

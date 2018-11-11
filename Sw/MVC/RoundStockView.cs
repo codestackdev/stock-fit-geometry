@@ -70,6 +70,10 @@ namespace CodeStack.Community.StockFit.Sw.MVC
                     UseCustomStep = customStep,
                     StockStep = defStep,
                     CustomStep = step
+                },
+                ExtraMaterial = new ExtraMaterialOptions()
+                {
+                    AdditionalRadius = parameters.ExtraRadius
                 }
             };
         }
@@ -79,6 +83,7 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             parameters.Direction = Conditions.Direction;
             parameters.CreateSolidBody = Conditions.CreateSolidBody;
             parameters.ConcenticWithCylindricalFace = Conditions.ConcentricWithCylindricalFace;
+            parameters.ExtraRadius = ExtraMaterial.AdditionalRadius;
 
             double stockStep = 0;
 
@@ -143,21 +148,32 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
         public class RoundingOptions
         {
-            [DisplayName("Predefined rounding step")]
+            [Description("Predefined rounding step")]
             [ControlTag(RoundStepControls_e.StockStep)]
             [DependentOn(typeof(StockStepDependencyHandler), RoundStepControls_e.UseCustomStep)]
+            [ControlAttribution(typeof(Resources), nameof(Resources.round_step_predefined))]
             public StockSteps_e StockStep { get; set; }
 
             [DisplayName("Use custom round step")]
             [ControlTag(RoundStepControls_e.UseCustomStep)]
             public bool UseCustomStep { get; set; }
 
-            [DisplayName("Custom rounding step")]
+            [Description("Custom rounding step")]
             [NumberBoxOptions(swNumberboxUnitType_e.swNumberBox_Length, 0, 1000, 0.001,
                 true, 0.01, 0.0005, swPropMgrPageNumberBoxStyle_e.swPropMgrPageNumberBoxStyle_Thumbwheel)]
             [DependentOn(typeof(StockStepDependencyHandler), RoundStepControls_e.UseCustomStep)]
             [ControlTag(RoundStepControls_e.CustomStep)]
+            [ControlAttribution(typeof(Resources), nameof(Resources.round_step_custom))]
             public double CustomStep { get; set; }
+        }
+
+        public class ExtraMaterialOptions
+        {
+            [Description("Add additional material to cylinder diameter")]
+            [NumberBoxOptions(swNumberboxUnitType_e.swNumberBox_Length, 0, 1000, 0.001,
+                true, 0.01, 0.0005, swPropMgrPageNumberBoxStyle_e.swPropMgrPageNumberBoxStyle_Thumbwheel)]
+            [ControlAttribution(swControlBitmapLabelType_e.swBitmapLabel_Diameter)]
+            public double AdditionalRadius { get; set; }
         }
 
         public class ConditionOptions
@@ -179,6 +195,9 @@ namespace CodeStack.Community.StockFit.Sw.MVC
         public ConditionOptions Conditions { get; set; }
         
         public RoundingOptions Rounding { get; set; }
+
+        [DisplayName("Extra Material")]
+        public ExtraMaterialOptions ExtraMaterial { get; set; }
     }
 
     public enum StockSteps_e

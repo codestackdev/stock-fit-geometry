@@ -71,7 +71,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
             m_ActivePage.Show();
             
-            m_Model.ShowPreview(part, parameters.Direction, parameters.ConcenticWithCylindricalFace, parameters.StockStep);
+            m_Model.ShowPreview(part, parameters.Direction, parameters.ConcenticWithCylindricalFace,
+                parameters.StockStep, parameters.ExtraRadius);
         }
 
         private void OnDataChanged()
@@ -79,7 +80,7 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_CurrentViewModel.WriteToParameters(m_CurrentParameters);
 
             m_Model.ShowPreview(m_CurrentPart, m_CurrentParameters.Direction,
-                m_CurrentParameters.ConcenticWithCylindricalFace, m_CurrentParameters.StockStep);
+                m_CurrentParameters.ConcenticWithCylindricalFace, m_CurrentParameters.StockStep, m_CurrentParameters.ExtraRadius);
         }
 
         private void OnPageClosing(swPropertyManagerPageCloseReasons_e reason, SwEx.PMPage.Base.ClosingArg arg)
@@ -93,7 +94,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
                 try
                 {
                     var cylParams = m_Model.GetCylinderParameters(m_CurrentPart, m_CurrentParameters.Direction,
-                        m_CurrentParameters.ConcenticWithCylindricalFace, m_CurrentParameters.StockStep);
+                        m_CurrentParameters.ConcenticWithCylindricalFace,
+                        m_CurrentParameters.StockStep, m_CurrentParameters.ExtraRadius);
 
                     body = m_Model.CreateCylindricalStock(cylParams);
                 }

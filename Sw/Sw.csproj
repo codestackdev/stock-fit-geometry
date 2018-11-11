@@ -157,6 +157,18 @@
   <ItemGroup>
     <None Include="Resources\round_stock_dlg_icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Licenses.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Eula.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\round-step-predefined.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\round-step-custom.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

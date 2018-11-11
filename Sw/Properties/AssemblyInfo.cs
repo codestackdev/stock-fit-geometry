@@ -28,7 +28,7 @@ using Xarial.AppLaunchKit.Services.Attributes;
 
 [assembly: Log("CodeStack", "StockMaster", true, false)]
 //[assembly: UserSettings("Settings", false, typeof(CustomUserSettingsBackwardCompatibility))]
-[assembly: About(typeof(Resources), nameof(Resources.round_stock_icon))]
+[assembly: About(typeof(Resources), nameof(Resources.Eula), nameof(Resources.Licenses), nameof(Resources.round_stock_icon))]
 
 [assembly: ApplicationInfo(typeof(Resources), System.Environment.SpecialFolder.ApplicationData,
     nameof(Resources.WorkDir), nameof(Resources.AppTitle), nameof(Resources.round_stock_dlg_icon))]
