@@ -1,4 +1,5 @@
 ﻿using CodeStack.Community.StockFit.Sw.Properties;
+using CodeStack.Community.StockFit.Sw.Services;
 using SolidWorks.Interop.sldworks;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -27,7 +28,7 @@ using Xarial.AppLaunchKit.Services.Attributes;
 //[assembly: UpdatesUrl(typeof(UpdatesServerMock), nameof(UpdatesServerMock.UpdateUrl))]
 
 [assembly: Log("CodeStack", "StockMaster", true, false)]
-//[assembly: UserSettings("Settings", false, typeof(CustomUserSettingsBackwardCompatibility))]
+[assembly: UserSettings("Settings", false, typeof(RoundStockFeatureParametersBackwardCompatibility))]
 [assembly: About(typeof(Resources), nameof(Resources.Eula), nameof(Resources.Licenses), nameof(Resources.round_stock_icon))]
 
 [assembly: ApplicationInfo(typeof(Resources), System.Environment.SpecialFolder.ApplicationData,

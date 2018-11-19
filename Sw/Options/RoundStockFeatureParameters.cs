@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Serialization;
+using Xarial.AppLaunchKit.Services.UserSettings.Attributes;
 
 namespace CodeStack.Community.StockFit.Sw.Options
 {
@@ -26,6 +28,8 @@ namespace CodeStack.Community.StockFit.Sw.Options
         ExtaRadius = 2
     }
 
+    //TODO: make settings a separate class and separate the macro feature parameter from here
+    [UserSettingVersion("1.0")]
     public class RoundStockFeatureParameters
     {
         [ParameterSelection(0)]

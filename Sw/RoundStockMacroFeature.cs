@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -30,6 +31,8 @@ namespace CodeStack.Community.StockFit.Sw
     [ProgId(Id)]
     [Options("CodeStack.RoundStock", swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd)]
     [Icon(typeof(Resources), nameof(Resources.round_stock_icon), "CodeStack\\StockMaster\\Icons")]
+    [ClassInterface(ClassInterfaceType.None)]
+    [ComDefaultInterface(typeof(ISwComFeature))]
     public class RoundStockMacroFeature : MacroFeatureEx<RoundStockFeatureParameters>
     {
         public const string Id = "CodeStack.StockMacroFeature";

@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -50,16 +51,16 @@ namespace CodeStack.Community.StockFit.Sw
 
         private RoundStockController m_Controller;
 
-        private OptionsStore m_OptsStore;
+        private IUserSettingsService m_UserSettings;
 
         public override bool OnConnect()
         {
             try
             {
                 AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-                m_Container = new ServicesContainer(m_App);
+                m_Container = new ServicesContainer(App);
 
-                m_OptsStore = m_Container.GetService<OptionsStore>();
+                m_UserSettings = m_Container.GetService<IUserSettingsService>();
 
                 m_Controller = m_Container.GetService<RoundStockController>();
                 m_Controller.FeatureInsertionCompleted += OnFeatureInsertionCompleted;
@@ -77,6 +78,9 @@ namespace CodeStack.Community.StockFit.Sw
                 catch
                 {
                 }
+
+                App.SendMsgToUser2($"Failed to load {Resources.AppTitle}. Please see log for more details",
+                    (int)swMessageBoxIcon_e.swMbStop, (int)swMessageBoxBtn_e.swMbOk);
 
                 return false;
             }
@@ -118,14 +122,12 @@ namespace CodeStack.Community.StockFit.Sw
             switch (cmd)
             {
                 case Commands_e.CreateStockFeature:
-                    var par = m_OptsStore.Load<RoundStockFeatureParameters>();
-                    m_Controller.ShowPage(par, m_App.IActiveDoc2 as IPartDoc, null);
+                    var par = m_UserSettings.ReadSettings<RoundStockFeatureParameters>(nameof(RoundStockFeatureParameters));
+                    m_Controller.ShowPage(par, App.IActiveDoc2 as IPartDoc, null);
                     break;
 
                 case Commands_e.About:
                     m_Container.GetService<IAboutApplicationService>().ShowAboutForm();
-                    //var aboutForm = new AboutForm();
-                    //aboutForm.ShowDialog();
                     break;
             }
         }

@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -20,6 +21,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Unity.Attributes;
+using Xarial.AppLaunchKit.Base.Services;
 
 namespace CodeStack.Community.StockFit.Sw.MVC
 {
@@ -29,8 +31,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
         private readonly ISldWorks m_App;
         private readonly RoundStockModel m_Model;
-        
-        private readonly OptionsStore m_OptsStore;
+
+        private readonly IUserSettingsService m_UserSetts;
 
         private IPartDoc m_CurrentPart;
         private RoundStockFeatureParameters m_CurrentParameters;
@@ -40,12 +42,12 @@ namespace CodeStack.Community.StockFit.Sw.MVC
         public event Action<RoundStockFeatureParameters, IPartDoc, IFeature, bool> FeatureEditingCompleted;
         public event Action<RoundStockFeatureParameters, IPartDoc, bool> FeatureInsertionCompleted;
 
-        public RoundStockController(ISldWorks app, RoundStockModel model, 
-            OptionsStore opts)
+        public RoundStockController(ISldWorks app, RoundStockModel model,
+            IUserSettingsService opts)
         {
             m_App = app;
             m_Model = model;
-            m_OptsStore = opts;
+            m_UserSetts = opts;
         }
 
         public void ShowPage(RoundStockFeatureParameters parameters, IPartDoc part, IFeature editingFeature)
@@ -124,7 +126,8 @@ namespace CodeStack.Community.StockFit.Sw.MVC
                 m_CurrentParameters.ScopeBody = m_Model.GetScopeBody(
                     m_CurrentPart, m_CurrentParameters.Direction);
 
-                m_OptsStore.Save(m_CurrentParameters);
+                m_UserSetts.StoreSettings(m_CurrentParameters, nameof(RoundStockFeatureParameters));
+                //m_OptsStore.Save(m_CurrentParameters);
             }
 
             if (m_EditingFeature != null)

@@ -42,8 +42,8 @@
     <Reference Include="CodeStack.Community.DevTools.Sw.Testing">
       <HintPath>thirdpty\CodeStack.Community.DevTools.Sw.Testing.dll</HintPath>
     </Reference>
-    <Reference Include="CodeStack.SwEx.AddIn, Version=0.3.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CodeStack.SwEx.AddIn.0.3.0\lib\net40\CodeStack.SwEx.AddIn.dll</HintPath>
+    <Reference Include="CodeStack.SwEx.AddIn, Version=0.3.1.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CodeStack.SwEx.AddIn.0.3.1\lib\net40\CodeStack.SwEx.AddIn.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CodeStack.SwEx.Common, Version=0.9.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
@@ -94,6 +94,7 @@
     <Compile Include="SwVectorMathServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Data\t1.SLDPRT">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

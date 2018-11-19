@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLFOLDER" />
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="AddInComRegGroup">
+            <Component Id="cmp0CEDE2B3D235BC34105BB5290CB1A1CD" Directory="INSTALLFOLDER" Guid="*">
+                <Class Id="{47827004-8897-49F5-9C65-5B845DC7F5AC}" Context="InprocServer32" Description="CodeStack.Community.StockFit.Sw.RoundStockMacroFeature" ThreadingModel="both" ForeignServer="mscoree.dll">
+                    <ProgId Id="CodeStack.StockMacroFeature" Description="CodeStack.Community.StockFit.Sw.RoundStockMacroFeature" />
+                </Class>
+                <Class Id="{923CD9C0-B8C7-44D3-8028-1039B771CA1A}" Context="InprocServer32" Description="CodeStack.Community.StockFit.Sw.MVC.RoundStockViewHandler" ThreadingModel="both" ForeignServer="mscoree.dll">
+                    <ProgId Id="CodeStack.Community.StockFit.Sw.MVC.RoundStockViewHandler" Description="CodeStack.Community.StockFit.Sw.MVC.RoundStockViewHandler" />
+                </Class>
+                <Class Id="{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}" Context="InprocServer32" Description="CodeStack.Community.StockFit.Sw.SwStockFitGeometryAddIn" ThreadingModel="both" ForeignServer="mscoree.dll">
+                    <ProgId Id="CodeStack.StockFitGeometry" Description="CodeStack.Community.StockFit.Sw.SwStockFitGeometryAddIn" />
+                </Class>
+                <File Id="fil86FCD0772EE501A170E77896AD937178" KeyPath="yes" Source="$(var.SourceOutDir)\CodeStack.StockFit.Sw.dll" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\Implemented Categories\{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32\0.5.0.0" Name="Class" Value="CodeStack.Community.StockFit.Sw.RoundStockMacroFeature" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32\0.5.0.0" Name="Assembly" Value="CodeStack.StockFit.Sw, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32\0.5.0.0" Name="RuntimeVersion" Value="v4.0.30319" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32\0.5.0.0" Name="CodeBase" Value="file:///[#fil86FCD0772EE501A170E77896AD937178]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32" Name="Class" Value="CodeStack.Community.StockFit.Sw.RoundStockMacroFeature" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32" Name="Assembly" Value="CodeStack.StockFit.Sw, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32" Name="RuntimeVersion" Value="v4.0.30319" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{47827004-8897-49F5-9C65-5B845DC7F5AC}\InprocServer32" Name="CodeBase" Value="file:///[#fil86FCD0772EE501A170E77896AD937178]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\Implemented Categories\{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32\0.5.0.0" Name="Class" Value="CodeStack.Community.StockFit.Sw.MVC.RoundStockViewHandler" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32\0.5.0.0" Name="Assembly" Value="CodeStack.StockFit.Sw, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32\0.5.0.0" Name="RuntimeVersion" Value="v4.0.30319" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32\0.5.0.0" Name="CodeBase" Value="file:///[#fil86FCD0772EE501A170E77896AD937178]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32" Name="Class" Value="CodeStack.Community.StockFit.Sw.MVC.RoundStockViewHandler" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32" Name="Assembly" Value="CodeStack.StockFit.Sw, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32" Name="RuntimeVersion" Value="v4.0.30319" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{923CD9C0-B8C7-44D3-8028-1039B771CA1A}\InprocServer32" Name="CodeBase" Value="file:///[#fil86FCD0772EE501A170E77896AD937178]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\Implemented Categories\{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32\0.5.0.0" Name="Class" Value="CodeStack.Community.StockFit.Sw.SwStockFitGeometryAddIn" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32\0.5.0.0" Name="Assembly" Value="CodeStack.StockFit.Sw, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32\0.5.0.0" Name="RuntimeVersion" Value="v4.0.30319" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32\0.5.0.0" Name="CodeBase" Value="file:///[#fil86FCD0772EE501A170E77896AD937178]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32" Name="Class" Value="CodeStack.Community.StockFit.Sw.SwStockFitGeometryAddIn" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32" Name="Assembly" Value="CodeStack.StockFit.Sw, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32" Name="RuntimeVersion" Value="v4.0.30319" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}\InprocServer32" Name="CodeBase" Value="file:///[#fil86FCD0772EE501A170E77896AD937178]" Type="string" Action="write" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

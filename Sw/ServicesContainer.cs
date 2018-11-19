@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -69,12 +70,12 @@ namespace CodeStack.Community.StockFit.Sw
             m_Container.RegisterType<RoundStockController>(
                 new ContainerControlledLifetimeManager());
 
-            m_Container.RegisterType<OptionsStore>(
-                new ContainerControlledLifetimeManager());
+            //m_Container.RegisterType<OptionsStore>(
+            //    new ContainerControlledLifetimeManager());
 
             m_Kit = new ServicesManager(this.GetType().Assembly, new IntPtr(app.IFrameObject().GetHWnd()),
                 //typeof(UpdatesService),
-                //typeof(UserSettingsService),
+                typeof(UserSettingsService),
                 //typeof(ExternalProcessService),
                 typeof(SystemEventLogService),
                 typeof(AboutApplicationService));
@@ -83,7 +84,7 @@ namespace CodeStack.Community.StockFit.Sw
             m_Kit.StartServices();
 
             m_Container.RegisterInstance(m_Kit.GetService<ILogService>());
-            //m_Container.RegisterInstance(m_Kit.GetService<IUserSettingsService>());
+            m_Container.RegisterInstance(m_Kit.GetService<IUserSettingsService>());
             m_Container.RegisterInstance(m_Kit.GetService<IAboutApplicationService>());
         }
 
