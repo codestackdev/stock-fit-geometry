@@ -42,6 +42,14 @@ namespace CodeStack.Community.StockFit.Sw.MVC
         public event Action<RoundStockFeatureParameters, IPartDoc, IFeature, bool> FeatureEditingCompleted;
         public event Action<RoundStockFeatureParameters, IPartDoc, bool> FeatureInsertionCompleted;
 
+        public ISldWorks App
+        {
+            get
+            {
+                return m_App;
+            }
+        }
+
         public RoundStockController(ISldWorks app, RoundStockModel model,
             IUserSettingsService opts)
         {

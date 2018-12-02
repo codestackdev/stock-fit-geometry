@@ -23,6 +23,7 @@ using CodeStack.SwEx.MacroFeature.Attributes;
 using CodeStack.Community.StockFit.Sw.MVC;
 using System.Diagnostics;
 using CodeStack.Community.StockFit.Sw.Properties;
+using CodeStack.SwEx.MacroFeature.Exceptions;
 
 namespace CodeStack.Community.StockFit.Sw
 {
@@ -39,12 +40,12 @@ namespace CodeStack.Community.StockFit.Sw
 
         private readonly RoundStockModel m_StockModel;
         private readonly RoundStockController m_Controller;
-
+        
         public RoundStockMacroFeature() : base()
         {
             m_StockModel = ServicesContainer.Instance.GetService<RoundStockModel>();
             m_Controller = ServicesContainer.Instance.GetService<RoundStockController>();
-
+            
             m_Controller.FeatureEditingCompleted += OnFeatureEditingCompleted;
         }
 
@@ -53,9 +54,21 @@ namespace CodeStack.Community.StockFit.Sw
             if (isOk)
             {
                 var featData = feat.GetDefinition() as IMacroFeatureData;
-                SetParameters(featData, parameters);
 
-                feat.ModifyDefinition(featData, part, null);
+                try
+                {
+                    SetParameters(featData, parameters);
+                    feat.ModifyDefinition(featData, part, null);
+                }
+                catch(ParametersMismatchException)
+                {
+                    if (m_Controller.App.SendMsgToUser2("This features is an older version. It is required to replace it. Do you want to replace this feature?", 
+                        (int)swMessageBoxIcon_e.swMbWarning,
+                        (int)swMessageBoxBtn_e.swMbYesNo) == (int)swMessageBoxResult_e.swMbHitYes)
+                    {
+                        feat = (part as IModelDoc2).FeatureManager.ReplaceComFeature<RoundStockMacroFeature>(feat);
+                    }
+                }
             }
             else
             {
@@ -82,7 +95,7 @@ namespace CodeStack.Community.StockFit.Sw
         {
             (feature.GetDefinition() as IMacroFeatureData).AccessSelections(model, null);
 
-            m_Controller.ShowPage(GetParameters(feature.GetDefinition() as IMacroFeatureData), model as IPartDoc, feature);
+            m_Controller.ShowPage(GetParameters(feature, model), model as IPartDoc, feature);
 
             return true;
         }
@@ -99,7 +112,15 @@ namespace CodeStack.Community.StockFit.Sw
             parameters.Height = cylParams.Height;
             parameters.Radius = cylParams.Radius;
 
-            SetParameters(feature.GetDefinition() as IMacroFeatureData, parameters);
+            try
+            {
+                SetParameters(feature.GetDefinition() as IMacroFeatureData, parameters);
+            }
+            catch(ParametersMismatchException)
+            {
+                //TODO: Set legacy parameters
+                //TODO: warn user to update
+            }
 
             if (parameters.CreateSolidBody)
             {
