@@ -55,20 +55,21 @@ namespace CodeStack.Community.StockFit.Sw
             {
                 var featData = feat.GetDefinition() as IMacroFeatureData;
 
-                try
+                bool isOutdated;
+                SetParameters(part as IModelDoc2, feat, parameters, out isOutdated);
+                
+                if (isOutdated)
                 {
-                    SetParameters(featData, parameters);
-                    feat.ModifyDefinition(featData, part, null);
-                }
-                catch(ParametersMismatchException)
-                {
-                    if (m_Controller.App.SendMsgToUser2("This features is an older version. It is required to replace it. Do you want to replace this feature?", 
+                    if (m_Controller.App.SendMsgToUser2("This features is an older version. It is required to replace it. Do you want to replace this feature?",
                         (int)swMessageBoxIcon_e.swMbWarning,
                         (int)swMessageBoxBtn_e.swMbYesNo) == (int)swMessageBoxResult_e.swMbHitYes)
                     {
                         feat = (part as IModelDoc2).FeatureManager.ReplaceComFeature<RoundStockMacroFeature>(feat);
+                        return;
                     }
                 }
+
+                feat.ModifyDefinition(featData, part, null);
             }
             else
             {
@@ -112,14 +113,12 @@ namespace CodeStack.Community.StockFit.Sw
             parameters.Height = cylParams.Height;
             parameters.Radius = cylParams.Radius;
 
-            try
+            bool isOutdated;
+            SetParameters(model, feature, parameters, out isOutdated);
+
+            if (isOutdated)
             {
-                SetParameters(feature.GetDefinition() as IMacroFeatureData, parameters);
-            }
-            catch(ParametersMismatchException)
-            {
-                //TODO: Set legacy parameters
-                //TODO: warn user to update
+                //TODO: display warning
             }
 
             if (parameters.CreateSolidBody)
