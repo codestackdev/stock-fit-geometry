@@ -25,7 +25,7 @@ using Xarial.AppLaunchKit.Services.Attributes;
 [assembly: AssemblyVersion("0.5.0.0")]
 [assembly: AssemblyFileVersion("0.5.0.0")]
 
-//[assembly: UpdatesUrl(typeof(UpdatesServerMock), nameof(UpdatesServerMock.UpdateUrl))]
+[assembly: UpdatesUrl(typeof(Resources), nameof(Resources.UpdateUrl))]
 
 [assembly: Log("CodeStack", "StockMaster", true, false)]
 [assembly: UserSettings("Settings", false, typeof(RoundStockFeatureParametersBackwardCompatibility))]

@@ -61,6 +61,16 @@ namespace CodeStack.Community.StockFit.Sw.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap about_icon {
+            get {
+                object obj = ResourceManager.GetObject("about_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stock Master.
         /// </summary>
         internal static string AppTitle {
@@ -81,7 +91,8 @@ namespace CodeStack.Community.StockFit.Sw.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Icons by:
         ///http://www.fatcow.com/free-icons 
-        ///http://www.turbomilk.com.
+        ///http://www.turbomilk.com
+        ///http://www.iconarchive.com/icons/oxygen-icons.org/oxygen/authors.txt.
         /// </summary>
         internal static string Licenses {
             get {
@@ -125,6 +136,25 @@ namespace CodeStack.Community.StockFit.Sw.Properties {
         internal static System.Drawing.Bitmap round_stock_icon {
             get {
                 object obj = ResourceManager.GetObject("round_stock_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://www.codestack.net/labs/solidworks/stock-fit-geometry/version-info.json.
+        /// </summary>
+        internal static string UpdateUrl {
+            get {
+                return ResourceManager.GetString("UpdateUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap warning_icon {
+            get {
+                object obj = ResourceManager.GetObject("warning_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

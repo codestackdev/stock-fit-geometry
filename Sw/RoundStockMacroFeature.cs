@@ -49,22 +49,24 @@ namespace CodeStack.Community.StockFit.Sw
             m_Controller.FeatureEditingCompleted += OnFeatureEditingCompleted;
         }
 
-        private void OnFeatureEditingCompleted(RoundStockFeatureParameters parameters, IPartDoc part, IFeature feat, bool isOk)
+        private void OnFeatureEditingCompleted(RoundStockFeatureParameters parameters,
+            IPartDoc part, IFeature feat, IMacroFeatureData featData, bool isOk)
         {
             if (isOk)
             {
-                var featData = feat.GetDefinition() as IMacroFeatureData;
-
-                bool isOutdated;
-                SetParameters(part as IModelDoc2, feat, parameters, out isOutdated);
+                MacroFeatureOutdateState_e state;
+                SetParameters(part as IModelDoc2, feat, featData, parameters, out state);
                 
-                if (isOutdated)
+                if (state != MacroFeatureOutdateState_e.UpToDate)
                 {
-                    if (m_Controller.App.SendMsgToUser2("This features is an older version. It is required to replace it. Do you want to replace this feature?",
+                    if (m_Controller.App.SendMsgToUser2("This features is outdated. It is required to replace it. Do you want to replace this feature?",
                         (int)swMessageBoxIcon_e.swMbWarning,
                         (int)swMessageBoxBtn_e.swMbYesNo) == (int)swMessageBoxResult_e.swMbHitYes)
                     {
-                        feat = (part as IModelDoc2).FeatureManager.ReplaceComFeature<RoundStockMacroFeature>(feat);
+                        feat = (part as IModelDoc2).FeatureManager
+                            .ReplaceComFeature<RoundStockMacroFeature, RoundStockFeatureParameters>(
+                            feat, parameters);
+
                         return;
                     }
                 }
@@ -73,30 +75,17 @@ namespace CodeStack.Community.StockFit.Sw
             }
             else
             {
-                (feat.GetDefinition() as IMacroFeatureData).ReleaseSelectionAccess();
-            }
-
-            EnsureNotRolledBack(feat, part);
-        }
-
-        private void EnsureNotRolledBack(IFeature feat, IPartDoc part)
-        {
-            if (feat != null)
-            {
-                if (feat.IsRolledBack())
-                {
-                    Debug.Assert(false, "by some reasons roll back state doesn't go");
-                    (part as IModelDoc2).FeatureManager.EditRollback(
-                        (int)swMoveRollbackBarTo_e.swMoveRollbackBarToEnd, null);
-                }
+                featData.ReleaseSelectionAccess();
             }
         }
 
         protected override bool OnEditDefinition(ISldWorks app, IModelDoc2 model, IFeature feature)
         {
-            (feature.GetDefinition() as IMacroFeatureData).AccessSelections(model, null);
+            var featData = feature.GetDefinition() as IMacroFeatureData;
 
-            m_Controller.ShowPage(GetParameters(feature, model), model as IPartDoc, feature);
+            featData.AccessSelections(model, null);
+
+            m_Controller.ShowPage(GetParameters(feature, featData, model), model as IPartDoc, feature, featData);
 
             return true;
         }
@@ -113,12 +102,16 @@ namespace CodeStack.Community.StockFit.Sw
             parameters.Height = cylParams.Height;
             parameters.Radius = cylParams.Radius;
 
-            bool isOutdated;
-            SetParameters(model, feature, parameters, out isOutdated);
+            var featData = feature.GetDefinition() as IMacroFeatureData;
 
-            if (isOutdated)
+            MacroFeatureOutdateState_e state;
+            SetParameters(model, feature, featData, parameters, out state);
+
+            if (state != MacroFeatureOutdateState_e.UpToDate)
             {
-                //TODO: display warning
+                app.ShowBubbleTooltip("Stock Master",
+                    $"'{feature.Name}' feature is outdated. Edit definition of the feature to update",
+                    BubbleTooltipPosition_e.TopLeft, Resources.warning_icon);
             }
 
             if (parameters.CreateSolidBody)

@@ -42,8 +42,8 @@
       <HintPath>..\packages\CodeStack.SwEx.Common.0.9.0\lib\net40\CodeStack.SwEx.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CodeStack.SwEx.MacroFeature, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null, processorArchitecture=MSIL">
-      <HintPath>..\packages\CodeStack.SwEx.MacroFeature.0.1.0-alpha\lib\net40\CodeStack.SwEx.MacroFeature.dll</HintPath>
+    <Reference Include="CodeStack.SwEx.MacroFeature, Version=0.2.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.MacroFeature.0.2.0-alpha\lib\net40\CodeStack.SwEx.MacroFeature.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CodeStack.SwEx.PMPage, Version=0.4.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
@@ -126,6 +126,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\SldWorksExtension.cs" />
     <Compile Include="Math\SwVectorMathService.cs" />
     <Compile Include="Math\MathUtilityEx.cs" />
     <Compile Include="MVC\RoundStockModel.cs" />
@@ -179,6 +180,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\round-step-custom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\warning-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\about-icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

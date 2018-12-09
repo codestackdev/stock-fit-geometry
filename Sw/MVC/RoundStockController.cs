@@ -37,9 +37,11 @@ namespace CodeStack.Community.StockFit.Sw.MVC
         private IPartDoc m_CurrentPart;
         private RoundStockFeatureParameters m_CurrentParameters;
         private IFeature m_EditingFeature;
+        private IMacroFeatureData m_EditingFeatureData;
+
         private RoundStockViewModel m_CurrentViewModel;
 
-        public event Action<RoundStockFeatureParameters, IPartDoc, IFeature, bool> FeatureEditingCompleted;
+        public event Action<RoundStockFeatureParameters, IPartDoc, IFeature, IMacroFeatureData, bool> FeatureEditingCompleted;
         public event Action<RoundStockFeatureParameters, IPartDoc, bool> FeatureInsertionCompleted;
 
         public ISldWorks App
@@ -58,12 +60,13 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_UserSetts = opts;
         }
 
-        public void ShowPage(RoundStockFeatureParameters parameters, IPartDoc part, IFeature editingFeature)
+        public void ShowPage(RoundStockFeatureParameters parameters, IPartDoc part, IFeature editingFeature, IMacroFeatureData featData)
         {
             m_CurrentParameters = parameters;
             m_CurrentPart = part;
             m_EditingFeature = editingFeature;
-            
+            m_EditingFeatureData = featData;
+
             if (m_ActivePage != null)
             {
                 m_ActivePage.Handler.DataChanged -= OnDataChanged;
@@ -141,7 +144,7 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             if (m_EditingFeature != null)
             {
                 FeatureEditingCompleted?.Invoke(m_CurrentParameters, m_CurrentPart, m_EditingFeature,
-                    isOk);
+                    m_EditingFeatureData, isOk);
             }
             else
             {

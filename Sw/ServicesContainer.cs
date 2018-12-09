@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Unity;
 using Unity.Injection;
 using Unity.Lifetime;
@@ -69,25 +71,29 @@ namespace CodeStack.Community.StockFit.Sw
 
             m_Container.RegisterType<RoundStockController>(
                 new ContainerControlledLifetimeManager());
-
-            //m_Container.RegisterType<OptionsStore>(
-            //    new ContainerControlledLifetimeManager());
-
+            
             m_Kit = new ServicesManager(this.GetType().Assembly, new IntPtr(app.IFrameObject().GetHWnd()),
-                //typeof(UpdatesService),
+                typeof(UpdatesService),
                 typeof(UserSettingsService),
-                //typeof(ExternalProcessService),
                 typeof(SystemEventLogService),
                 typeof(AboutApplicationService));
 
             m_Kit.HandleError += OnHandleError;
-            m_Kit.StartServices();
 
+            var syncContext = SynchronizationContext.Current;
+
+            Task.Run(() =>
+            {
+                SynchronizationContext.SetSynchronizationContext(
+                        syncContext);
+                m_Kit.StartServicesAsync().Wait();
+            });
+            
             m_Container.RegisterInstance(m_Kit.GetService<ILogService>());
             m_Container.RegisterInstance(m_Kit.GetService<IUserSettingsService>());
             m_Container.RegisterInstance(m_Kit.GetService<IAboutApplicationService>());
         }
-
+        
         private bool OnHandleError(Exception ex)
         {
             try

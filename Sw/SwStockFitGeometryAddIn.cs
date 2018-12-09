@@ -24,7 +24,9 @@ namespace CodeStack.Community.StockFit.Sw
 {
 
     [Guid("DAA5615D-0BA6-461A-90DD-9E016E24C7AB"), ComVisible(true)]
+#if DEBUG
     [AutoRegister("Stock Master", "Stock Master")]
+#endif
     [ProgId(ID)]
     public class SwStockFitGeometryAddIn : SwAddInEx
     {
@@ -44,6 +46,7 @@ namespace CodeStack.Community.StockFit.Sw
             [Title("About...")]
             [Description("About Stock Master")]
             [CommandItemInfo(true, false, swWorkspaceTypes_e.All)]
+            [Icon(typeof(Resources), nameof(Resources.about_icon))]
             About
         }
 
@@ -123,7 +126,7 @@ namespace CodeStack.Community.StockFit.Sw
             {
                 case Commands_e.CreateStockFeature:
                     var par = m_UserSettings.ReadSettings<RoundStockFeatureParameters>(nameof(RoundStockFeatureParameters));
-                    m_Controller.ShowPage(par, App.IActiveDoc2 as IPartDoc, null);
+                    m_Controller.ShowPage(par, App.IActiveDoc2 as IPartDoc, null, null);
                     break;
 
                 case Commands_e.About:
