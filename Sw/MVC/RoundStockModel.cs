@@ -1,40 +1,59 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
 using CodeStack.Community.StockFit.Base.Math.Structures;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw;
+using CodeStack.Community.StockFit.Sw.Options;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xarial.AppLaunchKit.Base.Services;
 
 namespace CodeStack.Community.StockFit.MVC
 {
     public class RoundStockModel
     {
-        private ISldWorks m_App;
-        private CylindricalStockFitExtractor m_CylExt;
+        private readonly ISldWorks m_App;
+        private readonly IModeler m_Modeler;
+        private readonly CylindricalStockFitExtractor m_CylExt;
 
-        public RoundStockModel(ISldWorks app, CylindricalStockFitExtractor cylExt)
+        private readonly ILogService m_Log;
+
+        public RoundStockModel(ISldWorks app, CylindricalStockFitExtractor cylExt, ILogService log)
         {
             m_App = app;
+            m_Modeler = app.IGetModeler();
             m_CylExt = cylExt;
+            m_Log = log;
+
+            m_Log.LogMessage("Initialized round stock model");
         }
 
-        public IBody2 CreateCylindricalStock(IPartDoc part, object inputObj, 
-            bool concentric, double step, out CylinderParams cylParams)
+        public IBody2 CreateCylindricalStock(CylinderParams cylParams)
         {
+            return m_Modeler.CreateCylinder(new SwEx.MacroFeature.Data.Point(cylParams.Origin.ToArray()),
+                new SwEx.MacroFeature.Data.Vector(cylParams.Axis.ToArray()),
+                cylParams.Radius, cylParams.Height);
+        }
+
+        public CylinderParams GetCylinderParameters(IPartDoc part, object inputObj, bool concentric, double step, double extraRadius)
+        {
+            CylinderParams cylParams;
             var body = GetScopeBody(part, inputObj);
 
             var dir = GetDirection(inputObj);
-            
+
             cylParams = m_CylExt.GetStockParameters(new SolidBodyGeometry(body), dir);
+
+            cylParams.Radius = cylParams.Radius + extraRadius;
 
             if (concentric && (inputObj is IFace2) && (inputObj as IFace2).IGetSurface().IsCylinder())
             {
@@ -48,19 +67,45 @@ namespace CodeStack.Community.StockFit.MVC
                 cylParams = m_CylExt.FitToStockSizeByStep(cylParams, step);
             }
 
-            return CreateCylindricalBody(part, cylParams);
+            return cylParams;
         }
 
-        private IBody2 CreateCylindricalBody(IPartDoc part, CylinderParams cylParams)
-        {
-            var cylTempBody = m_App.IGetModeler().CreateBodyFromCyl(new double[]
-                    {
-                        cylParams.Origin.X, cylParams.Origin.Y, cylParams.Origin.Z,
-                        cylParams.Axis.X, cylParams.Axis.Y, cylParams.Axis.Z,
-                        cylParams.Radius, cylParams.Height
-                    }) as IBody2;
+        private IBody2 m_TempBody;
 
-            return cylTempBody;
+        public void ShowPreview(IPartDoc part, object inputObj, bool concentric, double step, double extraRadius)
+        {
+            HidePreview(part);
+
+            try
+            {
+                var cylParams = GetCylinderParameters(part, inputObj, concentric, step, extraRadius);
+                m_TempBody = CreateCylindricalStock(cylParams);
+            }
+            catch
+            {
+            }
+
+            if (m_TempBody != null)
+            {
+                const int COLORREF_YELLOW = 65535;
+
+                m_TempBody.Display3(part, COLORREF_YELLOW,
+                    (int)swTempBodySelectOptions_e.swTempBodySelectOptionNone);
+
+                m_TempBody.MaterialPropertyValues2 = new double[] { 1, 1, 0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
+
+                (part as IModelDoc2).GraphicsRedraw2();
+            }
+        }
+
+        public void HidePreview(IPartDoc part)
+        {
+            if (m_TempBody != null)
+            {
+                m_TempBody.Hide(part);
+                m_TempBody = null;
+                GC.Collect();
+            }
         }
 
         public IBody2 GetScopeBody(IPartDoc part, object inputObj)

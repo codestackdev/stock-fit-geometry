@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="Stock Master" Language="1033" Version="0.5.0.0" Manufacturer="Code Stack" UpgradeCode="{B55F33F5-9BD1-4895-A871-67FA0B8DFA39}">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of Stock Master is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<UIRef Id="WixUI_InstallDir" />
+		<UIRef Id="WixUI_Common" />
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<Icon Id="MainIconId" SourceFile="Resources\icon.ico" />
+		<Property Id="ARPPRODUCTICON" Value="MainIconId" />
+		<WixVariable Id="WixUIBannerBmp" Value="Resources\banner.bmp" />
+		<WixVariable Id="WixUIDialogBmp" Value="Resources\dialog.bmp" />
+		<WixVariable Id="WixUILicenseRtf" Value="Resources\eula.rtf" />
+
+		<Feature Id="ProductFeature" Title="Setup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentGroupRef Id="AddInComRegGroup" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="CodeStackDirId" Name="CodeStack">
+					<Directory Id="INSTALLFOLDER" Name="Stock Master" />
+				</Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="Reg" Guid="{67E783AD-AC11-4AB7-9C93-F8E6DA6F884A}">
+				<RegistryValue Root="HKCU" Key="Software\SolidWorks\AddInsStartup\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}" Value="1" Type="integer" Action="write" />
+				<RegistryValue Root="HKLM" Key="Software\SolidWorks\Addins\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}" Value="0" Type="integer" Action="write" />
+				<RegistryValue Root="HKLM" Key="Software\SolidWorks\Addins\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}" Name="Description" Value="Stock Master" Type="string" Action="write" />
+				<RegistryValue Root="HKLM" Key="Software\SolidWorks\Addins\{DAA5615D-0BA6-461A-90DD-9E016E24C7AB}" Name="Title" Value="Stock Master" Type="string" Action="write" />
+			</Component>
+			<Component Id="interops" Guid="{56554F91-344C-4984-B220-37594ABC75E8}">
+				<File Id="SolidWorks.Interop.sldworks.dllID" Name="SolidWorks.Interop.sldworks.dll" Source="$(var.SourceOutDir)\SolidWorks.Interop.sldworks.dll" />
+				<File Id="SolidWorks.Interop.swconst.dllID" Name="SolidWorks.Interop.swconst.dll" Source="$(var.SourceOutDir)\SolidWorks.Interop.swconst.dll" />
+				<File Id="SolidWorks.Interop.swpublished.dllID" Name="SolidWorks.Interop.swpublished.dll" Source="$(var.SourceOutDir)\SolidWorks.Interop.swpublished.dll" />
+				<File Id="SolidWorksTools.dllID" Name="SolidWorksTools.dll" Source="$(var.SourceOutDir)\SolidWorksTools.dll" />
+			</Component>
+			<Component Id="files" Guid="{03CECC23-DED1-4C4D-8D2E-A2B58C1240F1}">
+				<File Id="CodeStack.StockFit.Base.dllID" Name="CodeStack.StockFit.Base.dll" Source="$(var.SourceOutDir)\CodeStack.StockFit.Base.dll" />
+				<File Id="CodeStack.StockFit.Stocks.Cylinder.dllID" Name="CodeStack.StockFit.Stocks.Cylinder.dll" Source="$(var.SourceOutDir)\CodeStack.StockFit.Stocks.Cylinder.dll" />
+				<File Id="CommonServiceLocator.dllID" Name="CommonServiceLocator.dll" Source="$(var.SourceOutDir)\CommonServiceLocator.dll" />
+		</Component>
+			<Component Id="swex" Guid="{C1E3F708-8058-4F8C-979D-75723025570D}">
+				<File Id="CodeStack.SwEx.AddIn.dllID" Name="CodeStack.SwEx.AddIn.dll" Source="$(var.SourceOutDir)\CodeStack.SwEx.AddIn.dll" />
+				<File Id="CodeStack.SwEx.Common.dllID" Name="CodeStack.SwEx.Common.dll" Source="$(var.SourceOutDir)\CodeStack.SwEx.Common.dll" />
+				<File Id="CodeStack.SwEx.MacroFeature.dllID" Name="CodeStack.SwEx.MacroFeature.dll" Source="$(var.SourceOutDir)\CodeStack.SwEx.MacroFeature.dll" />
+				<File Id="CodeStack.SwEx.PMPage.dllID" Name="CodeStack.SwEx.PMPage.dll" Source="$(var.SourceOutDir)\CodeStack.SwEx.PMPage.dll" />
+			</Component>
+			<Component Id="xarial" Guid="{4796ABDB-3AD0-456E-AD83-7F6310CA2017}">
+				<File Id="Xarial.Signal2Go.dllID" Name="Xarial.Signal2Go.dll" Source="$(var.SourceOutDir)\Xarial.Signal2Go.dll" />
+				<File Id="Xarial.Signal2Go.Services.UserSettings.dllID" Name="Xarial.Signal2Go.Services.UserSettings.dll" Source="$(var.SourceOutDir)\Xarial.Signal2Go.Services.UserSettings.dll" />
+				<File Id="Xarial.VPages.Framework.dllID" Name="Xarial.VPages.Framework.dll" Source="$(var.SourceOutDir)\Xarial.VPages.Framework.dll" />
+		</Component>
+			<Component Id="unity" Guid="{B546E585-F63A-41BE-A158-9B1EE663209C}">
+				<File Id="Unity.Abstractions.dllID" Name="Unity.Abstractions.dll" Source="$(var.SourceOutDir)\Unity.Abstractions.dll" />
+				<File Id="Unity.Configuration.dllID" Name="Unity.Configuration.dll" Source="$(var.SourceOutDir)\Unity.Configuration.dll" />
+				<File Id="Unity.Container.dllID" Name="Unity.Container.dll" Source="$(var.SourceOutDir)\Unity.Container.dll" />
+				<File Id="Unity.Interception.Configuration.dllID" Name="Unity.Interception.Configuration.dll" Source="$(var.SourceOutDir)\Unity.Interception.Configuration.dll" />
+				<File Id="Unity.Interception.dllID" Name="Unity.Interception.dll" Source="$(var.SourceOutDir)\Unity.Interception.dll" />
+				<File Id="Unity.RegistrationByConvention.dllID" Name="Unity.RegistrationByConvention.dll" Source="$(var.SourceOutDir)\Unity.RegistrationByConvention.dll" />
+				<File Id="Unity.ServiceLocation.dllID" Name="Unity.ServiceLocation.dll" Source="$(var.SourceOutDir)\Unity.ServiceLocation.dll" />
+			</Component>
+			<Component Id="utils" Guid="{52DC04EA-559E-440D-9E3C-77846E4C5E4A}">
+				<File Id="Newtonsoft.Json.dllID" Name="Newtonsoft.Json.dll" Source="$(var.SourceOutDir)\Newtonsoft.Json.dll" />
+		</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

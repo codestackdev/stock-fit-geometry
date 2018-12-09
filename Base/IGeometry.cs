@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -13,7 +14,7 @@ using System.Text;
 namespace CodeStack.Community.StockFit.Base
 {
     /// <summary>
-    /// Represents the 3D geometry of enity or body
+    /// Represents the 3D geometry of entity or body
     /// </summary>
     public interface IGeometry
     {

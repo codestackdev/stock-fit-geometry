@@ -1,13 +1,16 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
 using CodeStack.Community.StockFit.MVC;
 using CodeStack.Community.StockFit.Sw.Options;
-using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
-using CodeStack.Community.StockFit.Sw.Reflection;
+using CodeStack.Community.StockFit.Sw.Properties;
+using CodeStack.SwEx.PMPage;
+using CodeStack.SwEx.PMPage.Attributes;
+using CodeStack.SwEx.PMPage.Base;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -17,209 +20,203 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CodeStack.SwEx.PMPage.Controls;
+using System.Diagnostics;
 
 namespace CodeStack.Community.StockFit.Sw.MVC
 {
-    public class RoundStockView
+    [PageOptions(typeof(Resources), nameof(Resources.round_stock_icon),
+    swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton |
+            swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
+            | swPropertyManagerPageOptions_e.swPropertyManagerOptions_WhatsNew)]
+    [Message("Select cylindrical face or plane to generate the round stock", "Stock Feature")]
+    [Help("https://www.codestack.net/labs/solidworks/stock-fit-geometry/",
+    "https://www.codestack.net/labs/solidworks/stock-fit-geometry/whats-new")]
+    [DisplayName("Round Stock")]
+    public class RoundStockViewModel
     {
-        public event Action<RoundStockFeatureParameters> ParametersChanged;
-        public event Action<bool, RoundStockFeatureParameters> Closed;
-        public event Action<bool, RoundStockFeatureParameters> Closing;
-        public event Action Help;
-        public event Action WhatsNew;
-
-        private enum Controls_e
+        public static RoundStockViewModel FromParameters(RoundStockFeatureParameters parameters)
         {
-            [PmpControlType(swPropertyManagerPageControlType_e.swControlType_Selectionbox)]
-            [EnumDisplayName("Direction")]
-            [Description("Select cylindrical face or plane feature to specify the direction")]
-            DirectionSelection,
+            var step = parameters.StockStep;
+            var customStep = false;
+            StockSteps_e defStep = StockSteps_e.Step0;
 
-            [PmpControlType(swPropertyManagerPageControlType_e.swControlType_Combobox)]
-            [EnumDisplayName("Stock Step")]
-            [Description("Specifies the stock step")]
+            if (step == 0)
+            {
+                defStep = StockSteps_e.Step0;
+            }
+            else if (step == 0.0015875)
+            {
+                defStep = StockSteps_e.Step1_16;
+            }
+            else if (step == 0.003175)
+            {
+                defStep = StockSteps_e.Step1_8;
+            }
+            else
+            {
+                customStep = true;
+            }
+
+            return new RoundStockViewModel()
+            {
+                Conditions = new ConditionOptions()
+                {
+                    ConcentricWithCylindricalFace = parameters.ConcenticWithCylindricalFace,
+                    CreateSolidBody = parameters.CreateSolidBody,
+                    Direction = parameters.Direction
+                },
+                Rounding = new RoundingOptions()
+                {
+                    UseCustomStep = customStep,
+                    StockStep = defStep,
+                    CustomStep = step
+                },
+                ExtraMaterial = new ExtraMaterialOptions()
+                {
+                    AdditionalRadius = parameters.ExtraRadius
+                }
+            };
+        }
+
+        public void WriteToParameters(RoundStockFeatureParameters parameters)
+        {
+            parameters.Direction = Conditions.Direction;
+            parameters.CreateSolidBody = Conditions.CreateSolidBody;
+            parameters.ConcenticWithCylindricalFace = Conditions.ConcentricWithCylindricalFace;
+            parameters.ExtraRadius = ExtraMaterial.AdditionalRadius;
+
+            double stockStep = 0;
+
+            if (Rounding.UseCustomStep)
+            {
+                stockStep = Rounding.CustomStep;
+            }
+            else
+            {
+                switch (Rounding.StockStep)
+                {
+                    case StockSteps_e.Step0:
+                        stockStep = 0;
+                        break;
+
+                    case StockSteps_e.Step1_16:
+                        stockStep = 0.0015875;
+                        break;
+
+                    case StockSteps_e.Step1_8:
+                        stockStep = 0.003175;
+                        break;
+                }
+            }
+
+            parameters.StockStep = stockStep;
+        }
+
+        public enum RoundStepControls_e
+        {
             StockStep,
-
-            [PmpControlType(swPropertyManagerPageControlType_e.swControlType_Checkbox)]
-            [EnumDisplayName("Concentric")]
-            [Description("Specifies if the stock should be concentric with selected cylindrical face")]
-            Concentric,
-
-            [PmpControlType(swPropertyManagerPageControlType_e.swControlType_Checkbox)]
-            [EnumDisplayName("Create solid body")]
-            [Description("Specifies if solid body should be created")]
-            CreateSolidBody
+            UseCustomStep,
+            CustomStep
         }
 
-        private ISldWorks m_App;
-        private RoundStockModel m_StockModel;
-
-        private IPropertyManagerPage2 m_Page;
-        private RoundStockViewHandler m_Handler;
-
-        private Dictionary<Controls_e, IPropertyManagerPageControl> m_Controls;
-
-        private RoundStockFeatureParameters m_CurParameters;
-        private IModelDoc2 m_CurModel;
-
-        private RoundStockFeatureSettings m_Setts;
-
-        public RoundStockView(ISldWorks app, RoundStockModel stockTool, RoundStockFeatureSettings setts)
+        public class StockStepDependencyHandler : DependencyHandler
         {
-            m_App = app;
-            m_StockModel = stockTool;
-            m_Setts = setts;
-
-            m_Handler = new RoundStockViewHandler();
-            m_Handler.Closing += OnClosing;
-            m_Handler.Closed += OnClosed;
-            m_Handler.ValueChanged += OnValueChanged;
-            m_Handler.Help += OnHelp;
-            m_Handler.WhatsNew += OnWhatsNew;
-
-            var options = swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton |
-                swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
-                | swPropertyManagerPageOptions_e.swPropertyManagerOptions_WhatsNew;
-
-            int errors = -1;
-            m_Page = m_App.CreatePropertyManagerPage("Stock", 
-                (int)options, m_Handler, ref errors) as IPropertyManagerPage2;
-
-            m_Page.SetMessage3("Select cylindrical face or plane to generate the round stock",
-                (int)swPropertyManagerPageMessageVisibility.swMessageBoxVisible,
-                (int)swPropertyManagerPageMessageExpanded.swMessageBoxExpand, "Stock Feature");
-
-            string icon = Path.Combine(Path.GetDirectoryName(
-                        typeof(SwStockFitGeometryAddIn).Assembly.Location),
-                        "Icons\\FeatureIcon.bmp");
-
-            m_Page.SetTitleBitmap2(icon);
-
-            AddControls();
-        }
-
-        private void OnWhatsNew()
-        {
-            WhatsNew?.Invoke();
-        }
-
-        private void OnHelp()
-        {
-            Help?.Invoke();
-        }
-
-        private void OnClosing(bool isOk)
-        {
-            Closing?.Invoke(isOk, m_CurParameters);
-        }
-
-        private void OnValueChanged(int ctrlId)
-        {
-            var raiseChangeEvent = false;
-
-            var ctrlEnumId = (Controls_e)ctrlId;
-
-            switch (ctrlEnumId)
+            protected override void UpdateControlState(IPropertyManagerPageControlEx control, IPropertyManagerPageControlEx[] parents)
             {
-                case Controls_e.DirectionSelection:
-                    m_CurParameters.Direction = m_CurModel.ISelectionManager.GetSelectedObject6(
-                        (m_Controls[ctrlEnumId] as IPropertyManagerPageSelectionbox).SelectionIndex[0], -1);
-                    raiseChangeEvent = true;
-                    break;
+                if (parents != null && parents.Length == 1
+                    && RoundStepControls_e.UseCustomStep.Equals(parents.First().Tag))
+                {
+                    var useCustom = (bool)parents.First().GetValue();
 
-                case Controls_e.CreateSolidBody:
-                    m_CurParameters.CreateSolidBody = (m_Controls[ctrlEnumId] as IPropertyManagerPageCheckbox).Checked;
-                    break;
+                    switch ((RoundStepControls_e)control.Tag)
+                    {
+                        case RoundStepControls_e.CustomStep:
+                            control.Enabled = useCustom;
+                            break;
 
-                case Controls_e.Concentric:
-                    m_CurParameters.ConcenticWithCylindricalFace = (m_Controls[ctrlEnumId] as IPropertyManagerPageCheckbox).Checked;
-                    raiseChangeEvent = true;
-                    break;
-
-                case Controls_e.StockStep:
-                    m_CurParameters.StockStep = m_Setts.StockSteps.ElementAt((m_Controls[ctrlEnumId] as IPropertyManagerPageCombobox).CurrentSelection).Key;
-                    raiseChangeEvent = true;
-                    break;
-            }
-            
-            if (raiseChangeEvent)
-            {
-                ParametersChanged?.Invoke(m_CurParameters);
+                        case RoundStepControls_e.StockStep:
+                            control.Enabled = !useCustom;
+                            break;
+                    }
+                }
+                else
+                {
+                    Debug.Assert(false, "Invalid dependency. This handler should only be applied to rounding step controls");
+                }
             }
         }
 
-        private void OnClosed(bool isOk)
+        public class RoundingOptions
         {
-            Closed?.Invoke(isOk, m_CurParameters);
+            [Description("Predefined rounding step")]
+            [ControlTag(RoundStepControls_e.StockStep)]
+            [DependentOn(typeof(StockStepDependencyHandler), RoundStepControls_e.UseCustomStep)]
+            [ControlAttribution(typeof(Resources), nameof(Resources.round_step_predefined))]
+            public StockSteps_e StockStep { get; set; }
+
+            [DisplayName("Use custom round step")]
+            [ControlTag(RoundStepControls_e.UseCustomStep)]
+            public bool UseCustomStep { get; set; }
+
+            [Description("Custom rounding step")]
+            [NumberBoxOptions(swNumberboxUnitType_e.swNumberBox_Length, 0, 1000, 0.001,
+                true, 0.01, 0.0005, swPropMgrPageNumberBoxStyle_e.swPropMgrPageNumberBoxStyle_Thumbwheel)]
+            [DependentOn(typeof(StockStepDependencyHandler), RoundStepControls_e.UseCustomStep)]
+            [ControlTag(RoundStepControls_e.CustomStep)]
+            [ControlAttribution(typeof(Resources), nameof(Resources.round_step_custom))]
+            public double CustomStep { get; set; }
         }
 
-        private void AddControls()
+        public class ExtraMaterialOptions
         {
-            m_Controls = new Dictionary<Controls_e, IPropertyManagerPageControl>();
-            
-            foreach (Controls_e ctrlId in Enum.GetValues(typeof(Controls_e)))
-            {
-                var align = swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-                var options = swAddControlOptions_e.swControlOptions_Enabled |
-                          swAddControlOptions_e.swControlOptions_Visible;
-                
-                var type = ctrlId.GetAttribute<PmpControlTypeAttribute>().Type;
-                var title = ctrlId.GetAttribute<DisplayNameAttribute>().DisplayName;
-                var tip = ctrlId.GetAttribute<DescriptionAttribute>().Description;
-
-                var ctrl = m_Page.AddControl2((int)ctrlId,
-                    (short)type, title,
-                    (short)align, (int)options, tip) as IPropertyManagerPageControl;
-
-                m_Controls.Add(ctrlId, ctrl);
-            }
-
-            m_Controls[Controls_e.DirectionSelection].SetStandardPictureLabel(
-                (int)swControlBitmapLabelType_e.swBitmapLabel_SelectFace);
-
-            var selBox = m_Controls[Controls_e.DirectionSelection] as IPropertyManagerPageSelectionbox;
-
-            selBox.SingleEntityOnly = true;
-            var filter = new int[] { (int)swSelectType_e.swSelFACES, (int)swSelectType_e.swSelDATUMPLANES };
-            selBox.Height = 20;
-            selBox.SetSelectionFilters(filter);
-
-            m_Controls[Controls_e.StockStep].SetStandardPictureLabel(
-                (int)swControlBitmapLabelType_e.swBitmapLabel_LinearDistance);
-
-            var comboBox = m_Controls[Controls_e.StockStep] as IPropertyManagerPageCombobox;
-
-            comboBox.AddItems(m_Setts.StockSteps.Select(s => s.Key).ToArray());
+            [Description("Add additional material to cylinder diameter")]
+            [NumberBoxOptions(swNumberboxUnitType_e.swNumberBox_Length, 0, 1000, 0.001,
+                true, 0.01, 0.0005, swPropMgrPageNumberBoxStyle_e.swPropMgrPageNumberBoxStyle_Thumbwheel)]
+            [ControlAttribution(swControlBitmapLabelType_e.swBitmapLabel_Diameter)]
+            public double AdditionalRadius { get; set; }
         }
 
-        public void Show(RoundStockFeatureParameters parameters, IModelDoc2 model)
+        public class ConditionOptions
         {
-            const int DEFAULT_OPTION = 0;
+            [SelectionBox(swSelectType_e.swSelFACES, swSelectType_e.swSelDATUMPLANES)]
+            [DisplayName("Reference geometry defining the direction of round stock")]
+            [ControlAttribution(swControlBitmapLabelType_e.swBitmapLabel_SelectFace)]
+            public object Direction { get; set; }
 
-            m_CurParameters = parameters;
-            m_CurModel = model;
-            
-            (m_Controls[Controls_e.CreateSolidBody] as IPropertyManagerPageCheckbox).Checked = parameters.CreateSolidBody;
-            (m_Controls[Controls_e.Concentric] as IPropertyManagerPageCheckbox).Checked = parameters.ConcenticWithCylindricalFace;
-            (m_Controls[Controls_e.StockStep] as IPropertyManagerPageCombobox).CurrentSelection = (short)m_Setts.StockSteps.Keys.ToList().IndexOf(parameters.StockStep);
+            [DisplayName("Concentric with cylindrical face")]
+            [Description("Specifies if the round stock needs to be concentric with selected cylindrical face")]
+            public bool ConcentricWithCylindricalFace { get; set; } = true;
 
-            if (parameters.Direction != null)
-            {
-                (m_Controls[Controls_e.DirectionSelection] as IPropertyManagerPageSelectionbox).SetSelectionFocus();
-                m_CurModel.SelectDispatches(false, null, parameters.Direction);
-            }
-
-            m_Page.Show2(DEFAULT_OPTION);
+            [DisplayName("Create Solid Body")]
+            [Description("Specifies if solid body needs to be created")]
+            public bool CreateSolidBody { get; set; } = true;
         }
+        
+        public ConditionOptions Conditions { get; set; }
+        
+        public RoundingOptions Rounding { get; set; }
 
-        public void Dispose()
+        [DisplayName("Extra Material")]
+        public ExtraMaterialOptions ExtraMaterial { get; set; }
+    }
+
+    public enum StockSteps_e
+    {
+        [ComboBoxItemText("0")]
+        Step0, //0
+
+        [ComboBoxItemText("1/16")]
+        Step1_16,//0.0015875
+
+        [ComboBoxItemText("1/8")]
+        Step1_8//0.003175
+    }
+
+    public class RoundStockView : PropertyManagerPageEx<RoundStockViewHandler, RoundStockViewModel>
+    {
+        public RoundStockView(RoundStockViewModel model, ISldWorks app) : base(model, app)
         {
-            m_Handler.Closing -= OnClosing;
-            m_Handler.Closed -= OnClosed;
-            m_Handler.ValueChanged -= OnValueChanged;
-            m_Handler.Dispose();
-            m_Handler.Help -= OnHelp;
-            m_Handler.WhatsNew -= OnWhatsNew;
         }
     }
 }

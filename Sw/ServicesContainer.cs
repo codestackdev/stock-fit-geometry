@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -11,8 +12,6 @@ using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw.Math;
 using CodeStack.Community.StockFit.Sw.MVC;
 using CodeStack.Community.StockFit.Sw.Options;
-using CodeStack.Community.StockFit.Sw.Pmp;
-using CodeStack.Community.StockFit.Sw.Pmp.Attributes;
 using CodeStack.Community.StockFit.Sw.Services;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swpublished;
@@ -21,10 +20,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Unity;
 using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Resolution;
+using Xarial.AppLaunchKit;
+using Xarial.AppLaunchKit.Base.Services;
+using Xarial.AppLaunchKit.Services.About;
+using Xarial.AppLaunchKit.Services.External;
+using Xarial.AppLaunchKit.Services.Logger;
+using Xarial.AppLaunchKit.Services.Updates;
+using Xarial.AppLaunchKit.Services.UserSettings;
 
 namespace CodeStack.Community.StockFit.Sw
 {
@@ -40,6 +48,8 @@ namespace CodeStack.Community.StockFit.Sw
             get;
             private set;
         }
+
+        private ServicesManager m_Kit;
 
         public ServicesContainer(ISldWorks app)
         {
@@ -59,18 +69,42 @@ namespace CodeStack.Community.StockFit.Sw
             m_Container.RegisterType<IVectorMathService, SwVectorMathService>(
                 new ContainerControlledLifetimeManager());
 
-            m_Container.RegisterType<RoundStockView>(
-                new TransientLifetimeManager());
-
             m_Container.RegisterType<RoundStockController>(
-                new TransientLifetimeManager());
-
-            m_Container.RegisterType<OptionsStore>(
                 new ContainerControlledLifetimeManager());
+            
+            m_Kit = new ServicesManager(this.GetType().Assembly, new IntPtr(app.IFrameObject().GetHWnd()),
+                typeof(UpdatesService),
+                typeof(UserSettingsService),
+                typeof(SystemEventLogService),
+                typeof(AboutApplicationService));
 
-            var setts = m_Container.Resolve<RoundStockFeatureSettings>();
+            m_Kit.HandleError += OnHandleError;
 
-            m_Container.RegisterInstance(setts);
+            var syncContext = SynchronizationContext.Current;
+
+            Task.Run(() =>
+            {
+                SynchronizationContext.SetSynchronizationContext(
+                        syncContext);
+                m_Kit.StartServicesAsync().Wait();
+            });
+            
+            m_Container.RegisterInstance(m_Kit.GetService<ILogService>());
+            m_Container.RegisterInstance(m_Kit.GetService<IUserSettingsService>());
+            m_Container.RegisterInstance(m_Kit.GetService<IAboutApplicationService>());
+        }
+        
+        private bool OnHandleError(Exception ex)
+        {
+            try
+            {
+                m_Kit.GetService<ILogService>().LogException(ex);
+            }
+            catch
+            {
+            }
+
+            return true;
         }
 
         internal TService GetService<TService>()

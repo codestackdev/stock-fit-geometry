@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -8,6 +9,7 @@ using CodeStack.Community.StockFit.MVC;
 using CodeStack.Community.StockFit.Stocks.Cylinder;
 using CodeStack.Community.StockFit.Sw.Options;
 using CodeStack.Community.StockFit.Sw.Services;
+using CodeStack.SwEx.PMPage;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools.File;
@@ -19,228 +21,138 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Unity.Attributes;
+using Xarial.AppLaunchKit.Base.Services;
 
 namespace CodeStack.Community.StockFit.Sw.MVC
 {
-    /// <summary>
-    /// Controller which manages view <see cref="RoundStockView"/>  and model <see cref="RoundStockModel"/> 
-    /// </summary>
-    public class RoundStockController : IDisposable
+    public class RoundStockController
     {
-        private RoundStockView m_View;
-        private IFeature m_Feat;
-        private IPartDoc m_Part;
+        private RoundStockView m_ActivePage;
 
-        private IBody2 m_TempBody;
+        private readonly ISldWorks m_App;
+        private readonly RoundStockModel m_Model;
 
-        private RoundStockModel m_StockTool;
+        private readonly IUserSettingsService m_UserSetts;
 
-        private ISldWorks m_App;
+        private IPartDoc m_CurrentPart;
+        private RoundStockFeatureParameters m_CurrentParameters;
+        private IFeature m_EditingFeature;
+        private IMacroFeatureData m_EditingFeatureData;
 
-        private RoundStockFeatureSettings m_Setts;
+        private RoundStockViewModel m_CurrentViewModel;
 
-        private OptionsStore m_OptsStore;
+        public event Action<RoundStockFeatureParameters, IPartDoc, IFeature, IMacroFeatureData, bool> FeatureEditingCompleted;
+        public event Action<RoundStockFeatureParameters, IPartDoc, bool> FeatureInsertionCompleted;
 
-        public RoundStockController(ISldWorks app, RoundStockView view,
-            RoundStockModel stockModel, RoundStockFeatureSettings setts,
-            OptionsStore optsStore)
+        public ISldWorks App
+        {
+            get
+            {
+                return m_App;
+            }
+        }
+
+        public RoundStockController(ISldWorks app, RoundStockModel model,
+            IUserSettingsService opts)
         {
             m_App = app;
-            m_View = view;
-            m_StockTool = stockModel;
-            m_Setts = setts;
-            m_OptsStore = optsStore;
-
-            m_View.ParametersChanged += OnParametersChanged;
-            m_View.Closing += OnPageClosing;
-            m_View.Closed += OnPageClosed;
-            m_View.Help += OnHelp;
-            m_View.WhatsNew += OnWhatsNew;
+            m_Model = model;
+            m_UserSetts = opts;
         }
 
-        private void OnWhatsNew()
+        public void ShowPage(RoundStockFeatureParameters parameters, IPartDoc part, IFeature editingFeature, IMacroFeatureData featData)
         {
-            OpenHelp("https://www.codestack.net/labs/solidworks/stock-fit-geometry/whats-new");
-        }
+            m_CurrentParameters = parameters;
+            m_CurrentPart = part;
+            m_EditingFeature = editingFeature;
+            m_EditingFeatureData = featData;
 
-        private void OnHelp()
-        {
-            OpenHelp("https://www.codestack.net/labs/solidworks/stock-fit-geometry/");
-        }
-
-        private void OpenHelp(string link)
-        {
-            try
+            if (m_ActivePage != null)
             {
-                System.Diagnostics.Process.Start(link);
+                m_ActivePage.Handler.DataChanged -= OnDataChanged;
+                m_ActivePage.Handler.Closing -= OnPageClosing;
+                m_ActivePage.Handler.Closed -= OnClosed;
             }
-            catch
-            {
-            }
+
+            m_CurrentViewModel = RoundStockViewModel.FromParameters(parameters);
+
+            m_ActivePage = new RoundStockView(m_CurrentViewModel, m_App);
+
+            m_ActivePage.Handler.DataChanged += OnDataChanged;
+            m_ActivePage.Handler.Closing += OnPageClosing;
+            m_ActivePage.Handler.Closed += OnClosed;
+
+            m_ActivePage.Show();
+            
+            m_Model.ShowPreview(part, parameters.Direction, parameters.ConcenticWithCylindricalFace,
+                parameters.StockStep, parameters.ExtraRadius);
         }
 
-        private void OnPageClosing(bool isOk, RoundStockFeatureParameters par)
+        private void OnDataChanged()
         {
-            if (isOk)
-            {
-                Exception err;
+            m_CurrentViewModel.WriteToParameters(m_CurrentParameters);
 
-                if (CreateBody(par, out err) == null)
+            m_Model.ShowPreview(m_CurrentPart, m_CurrentParameters.Direction,
+                m_CurrentParameters.ConcenticWithCylindricalFace, m_CurrentParameters.StockStep, m_CurrentParameters.ExtraRadius);
+        }
+
+        private void OnPageClosing(swPropertyManagerPageCloseReasons_e reason, SwEx.PMPage.Base.ClosingArg arg)
+        {
+            if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
+            {
+                IBody2 body = null;
+
+                Exception err = null;
+
+                try
                 {
-                    m_App.ShowBubbleTooltipAt2(0, 0,
-                                (int)swArrowPosition.swArrowLeftTop, "Error", err.Message,
-                                (int)swBitMaps.swBitMapTreeError, "", "", 0, 0, "", "");
+                    var cylParams = m_Model.GetCylinderParameters(m_CurrentPart, m_CurrentParameters.Direction,
+                        m_CurrentParameters.ConcenticWithCylindricalFace,
+                        m_CurrentParameters.StockStep, m_CurrentParameters.ExtraRadius);
 
-                    var S_FALSE = 1;
-
-                    throw new COMException(err.Message, S_FALSE);
+                    body = m_Model.CreateCylindricalStock(cylParams);
+                }
+                catch(Exception ex)
+                {
+                    err = ex;
+                }
+                
+                if (body == null)
+                {
+                    arg.Cancel = true;
+                    arg.ErrorTitle = "Cylindrical Stock Error";
+                    arg.ErrorMessage = err?.Message;
                 }
             }
         }
 
-        private void OnParametersChanged(RoundStockFeatureParameters par)
+        private void OnClosed(swPropertyManagerPageCloseReasons_e reason)
         {
-            ShowPreview(par);
-        }
+            m_Model.HidePreview(m_CurrentPart);
 
-        private void ShowPreview(RoundStockFeatureParameters par)
-        {
-            DisposeTempBody();
-            Exception err;
-            m_TempBody = CreateBody(par, out err);
-
-            if (m_TempBody != null)
-            {
-                const int COLORREF_YELLOW = 65535;
-
-                m_TempBody.Display3(m_Part, COLORREF_YELLOW,
-                    (int)swTempBodySelectOptions_e.swTempBodySelectOptionNone);
-
-                m_TempBody.MaterialPropertyValues2 = new double[] { 1, 1, 0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
-
-                (m_Part as IModelDoc2).GraphicsRedraw2();
-            }
-        }
-
-        private IBody2 CreateBody(RoundStockFeatureParameters par, out Exception err)
-        {
-            err = null;
-
-            try
-            {
-                CylinderParams cylParams;
-                var step = m_Setts.StockSteps.FirstOrDefault(s => s.Key == par.StockStep).Value;
-
-                return m_StockTool.CreateCylindricalStock(m_Part, par.Direction,
-                    par.ConcenticWithCylindricalFace, step, out cylParams);
-            }
-            catch(Exception ex)
-            {
-                err = ex;
-
-                return null;
-            }
-        }
-
-        private void OnPageClosed(bool isOk, RoundStockFeatureParameters par)
-        {
-            DisposeTempBody();
+            var isOk = reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay;
 
             if (isOk)
             {
-                par.ScopeBody = m_StockTool.GetScopeBody(m_Part, par.Direction);
+                m_CurrentParameters.ScopeBody = m_Model.GetScopeBody(
+                    m_CurrentPart, m_CurrentParameters.Direction);
 
-                m_OptsStore.Save(par);
+                m_UserSetts.StoreSettings(m_CurrentParameters, nameof(RoundStockFeatureParameters));
+                //m_OptsStore.Save(m_CurrentParameters);
+            }
 
-                string icon = Path.Combine(Path.GetDirectoryName(
-                    typeof(SwStockFitGeometryAddIn).Assembly.Location),
-                    "Icons\\FeatureIcon.bmp");
-
-                if (m_Feat == null)
-                {
-                    var feat = (m_Part as IModelDoc2).FeatureManager.InsertComFeature(
-                        "CodeStack.RoundStock", RoundStockMacroFeature.Id, par,
-                        new MacroFeatureDimension[] 
-                        {
-                            new MacroFeatureDimension(swDimensionType_e.swRadialDimension, 0),
-                            new MacroFeatureDimension(swDimensionType_e.swLinearDimension, 0)
-                        }, new MacroFeatureIcons(icon),
-                        swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd);
-
-                    Debug.Assert(feat != null);
-                }
-                else
-                {
-                    var featData = m_Feat.GetDefinition() as IMacroFeatureData;
-
-                    featData.SerializeParameters(par);
-
-                    var modRes = m_Feat.ModifyDefinition(featData, m_Part as IModelDoc2, null);
-
-                    Debug.Assert(modRes);
-                }
+            if (m_EditingFeature != null)
+            {
+                FeatureEditingCompleted?.Invoke(m_CurrentParameters, m_CurrentPart, m_EditingFeature,
+                    m_EditingFeatureData, isOk);
             }
             else
             {
-                if (m_Feat != null)
-                {
-                    (m_Feat.GetDefinition() as IMacroFeatureData).ReleaseSelectionAccess();
-                }
+                FeatureInsertionCompleted?.Invoke(m_CurrentParameters, m_CurrentPart, isOk);
             }
 
-            EnsureNotRolledBack();
-
-            Dispose();
-        }
-
-        private void EnsureNotRolledBack()
-        {
-            if (m_Feat != null)
-            {
-                if (m_Feat.IsRolledBack())
-                {
-                    Debug.Assert(false, "by some reasons roll back state doesn't go");
-                    (m_Part as IModelDoc2).FeatureManager.EditRollback(
-                        (int)swMoveRollbackBarTo_e.swMoveRollbackBarToEnd, null);
-                }
-            }
-        }
-
-        private void DisposeTempBody()
-        {
-            if (m_TempBody != null)
-            {
-                m_TempBody.Hide(m_Part);
-                m_TempBody = null;
-                GC.Collect();
-            }
-        }
-
-        public void Process(IPartDoc part, RoundStockFeatureParameters par = null, IFeature feat = null)
-        {
-            m_Part = part;
-
-            m_Feat = feat;
-
-            if (par == null)
-            {
-                par = m_OptsStore.Load<RoundStockFeatureParameters>();
-            }
-
-            m_View.Show(par, m_Part as IModelDoc2);
-
-            ShowPreview(par);
-        }
-
-        public void Dispose()
-        {
-            m_View.ParametersChanged -= OnParametersChanged;
-            m_View.Closing -= OnPageClosing;
-            m_View.Closed -= OnPageClosed;
-            m_View.Help -= OnHelp;
-            m_View.WhatsNew -= OnWhatsNew;
-
-            m_View.Dispose();
+            m_EditingFeature = null;
+            m_CurrentPart = null;
         }
     }
 }

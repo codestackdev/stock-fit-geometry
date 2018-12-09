@@ -1,6 +1,7 @@
 ﻿//**********************
-//Stock Fit Geometry
+//Stock Master
 //Copyright(C) 2018 www.codestack.net
+//Product: https://www.codestack.net/labs/solidworks/stock-fit-geometry/
 //License: https://github.com/codestack-net-dev/stock-fit-geometry/blob/master/LICENSE
 //**********************
 
@@ -130,8 +131,7 @@ namespace CodeStack.Community.StockFit.Stocks.Cylinder
                 Point endPt;
 
                 GetExtremePointsAligned(geom, vec, alignTransform, out startPt, out endPt);
-
-
+                
                 perPoints.Add(startPt);
                 perPoints.Add(endPt);
             }
