@@ -42,9 +42,8 @@
       <HintPath>..\packages\CodeStack.SwEx.Common.0.9.0\lib\net40\CodeStack.SwEx.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CodeStack.SwEx.MacroFeature, Version=0.2.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
-      <HintPath>..\packages\CodeStack.SwEx.MacroFeature.0.2.0-alpha\lib\net40\CodeStack.SwEx.MacroFeature.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="CodeStack.SwEx.MacroFeature, Version=0.3.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\CodeStack.SwEx.MacroFeature.0.3.0\lib\net40\CodeStack.SwEx.MacroFeature.dll</HintPath>
     </Reference>
     <Reference Include="CodeStack.SwEx.PMPage, Version=0.4.0.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
       <HintPath>..\packages\CodeStack.SwEx.PMPage.0.4.0\lib\net40\CodeStack.SwEx.PMPage.dll</HintPath>

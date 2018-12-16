@@ -10,6 +10,7 @@ using CodeStack.SwEx.MacroFeature.Attributes;
 using CodeStack.SwEx.MacroFeature.Base;
 using CodeStack.SwEx.MacroFeature.Data;
 using CodeStack.SwEx.MacroFeature.Mocks;
+using CodeStack.SwEx.MacroFeature.Placeholders;
 using CodeStack.SwEx.PMPage.Attributes;
 using Newtonsoft.Json;
 using SolidWorks.Interop.sldworks;
@@ -28,7 +29,7 @@ namespace CodeStack.Community.StockFit.Sw.Options
     {
         Radius = 0,
         Height = 1,
-        ExtaRadius = 2
+        ExtraRadius = 2
     }
 
     public class RoundStockFeatureParametersVersionConverter : ParametersVersionConverter
@@ -41,7 +42,7 @@ namespace CodeStack.Community.StockFit.Sw.Options
                 {
                     dispDims[0],
                     dispDims[1],
-                    new DisplayDimensionEmpty()
+                    new DisplayDimensionPlaceholder()
                 };
             }
 
@@ -85,22 +86,41 @@ namespace CodeStack.Community.StockFit.Sw.Options
             }
         }
 
+        private class Converter_1_0To1_1 : ParameterConverter
+        {
+            public override Dictionary<string, string> ConvertParameters(IModelDoc2 model, IFeature feat,
+                Dictionary<string, string> parameters)
+            {
+                var dirIndex = 0;
+                var scopeBodyIndex = 1;
+
+                parameters.Add(nameof(RoundStockFeatureParameters.Direction), dirIndex.ToString());
+                parameters.Add(nameof(RoundStockFeatureParameters.ScopeBody), scopeBodyIndex.ToString());
+                parameters.Add(nameof(RoundStockFeatureParameters.Radius), ((int)RoundStockFeatureDimensions_e.Radius).ToString());
+                parameters.Add(nameof(RoundStockFeatureParameters.Height), ((int)RoundStockFeatureDimensions_e.Height).ToString());
+                parameters.Add(nameof(RoundStockFeatureParameters.ExtraRadius), ((int)RoundStockFeatureDimensions_e.ExtraRadius).ToString());
+
+                return parameters;
+            }
+        }
+
         public RoundStockFeatureParametersVersionConverter()
         {
             Add(new Version("1.0"), new Converter_0_0To1_0());
+            Add(new Version("1.1"), new Converter_1_0To1_1());
         }
     }
 
     //TODO: make settings a separate class and separate the macro feature parameter from here
     [UserSettingVersion("1.0")]
-    [ParametersVersion("1.0", typeof(RoundStockFeatureParametersVersionConverter))]
+    [ParametersVersion("1.1", typeof(RoundStockFeatureParametersVersionConverter))]
     public class RoundStockFeatureParameters
     {
-        [ParameterSelection(0)]
+        [ParameterSelection]
         [IgnoreDataMember, XmlIgnore, JsonIgnore]
         public object Direction { get; set; }
 
-        [ParameterSelection(1)]
+        [ParameterSelection]
         [IgnoreDataMember, XmlIgnore, JsonIgnore]
         public IBody2 ScopeBody { get; set; }
 
@@ -108,15 +128,15 @@ namespace CodeStack.Community.StockFit.Sw.Options
         public bool CreateSolidBody { get; set; } = true;
         public double StockStep { get; set; }
 
-        [ParameterDimension(swDimensionType_e.swRadialDimension, (int)RoundStockFeatureDimensions_e.Radius)]
+        [ParameterDimension(swDimensionType_e.swRadialDimension)]
         [IgnoreDataMember, XmlIgnore, JsonIgnore]
         public double Radius { get; set; }
 
-        [ParameterDimension(swDimensionType_e.swLinearDimension, (int)RoundStockFeatureDimensions_e.Height)]
+        [ParameterDimension(swDimensionType_e.swLinearDimension)]
         [IgnoreDataMember, XmlIgnore, JsonIgnore]
         public double Height { get; set; }
 
-        [ParameterDimension(swDimensionType_e.swLinearDimension, (int)RoundStockFeatureDimensions_e.ExtaRadius)]
+        [ParameterDimension(swDimensionType_e.swLinearDimension)]
         public double ExtraRadius { get; set; }
     }
 }

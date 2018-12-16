@@ -160,7 +160,7 @@ namespace CodeStack.Community.StockFit.Sw
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.ReadOnly = true;
 
-            dims[(int)RoundStockFeatureDimensions_e.ExtaRadius].Dimension.SetDirection(
+            dims[(int)RoundStockFeatureDimensions_e.ExtraRadius].Dimension.SetDirection(
                 startExtraDiamPt, diamDir, parameters.ExtraRadius);
         }
 
