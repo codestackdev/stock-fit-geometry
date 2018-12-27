@@ -32,21 +32,21 @@ namespace CodeStack.Community.StockFit.Sw
     {
         public const string ID = "CodeStack.StockFitGeometry";
         
-        [Title("Stock Master")]
+        [SwEx.Common.Attributes.Title("Stock Master")]
         [Description("Stock Master")]
-        [Icon(typeof(Resources), nameof(Resources.round_stock_icon))]
+        [SwEx.Common.Attributes.Icon(typeof(Resources), nameof(Resources.round_stock_icon))]
         private enum Commands_e
         {
-            [Title("Create Stock Feature")]
+            [SwEx.Common.Attributes.Title("Create Stock Feature")]
             [Description("Creates Stock Feature")]
             [CommandItemInfo(true, true, swWorkspaceTypes_e.Part)]
-            [Icon(typeof(Resources), nameof(Resources.round_stock_icon))]
+            [SwEx.Common.Attributes.Icon(typeof(Resources), nameof(Resources.round_stock_icon))]
             CreateStockFeature,
 
-            [Title("About...")]
+            [SwEx.Common.Attributes.Title("About...")]
             [Description("About Stock Master")]
             [CommandItemInfo(true, false, swWorkspaceTypes_e.All)]
-            [Icon(typeof(Resources), nameof(Resources.about_icon))]
+            [SwEx.Common.Attributes.Icon(typeof(Resources), nameof(Resources.about_icon))]
             About
         }
 

@@ -31,7 +31,7 @@ namespace CodeStack.Community.StockFit.Sw
     [Guid("47827004-8897-49F5-9C65-5B845DC7F5AC")]
     [ProgId(Id)]
     [Options("CodeStack.RoundStock", swMacroFeatureOptions_e.swMacroFeatureAlwaysAtEnd)]
-    [Icon(typeof(Resources), nameof(Resources.round_stock_icon), "CodeStack\\StockMaster\\Icons")]
+    [FeatureIcon(typeof(Resources), nameof(Resources.round_stock_icon), "CodeStack\\StockMaster\\Icons")]
     [ClassInterface(ClassInterfaceType.None)]
     [ComDefaultInterface(typeof(ISwComFeature))]
     public class RoundStockMacroFeature : MacroFeatureEx<RoundStockFeatureParameters>
@@ -125,8 +125,7 @@ namespace CodeStack.Community.StockFit.Sw
             }
         }
 
-        protected override void OnSetDimensions(ISldWorks app, IModelDoc2 model, IFeature feature,
-            DimensionDataCollection dims, RoundStockFeatureParameters parameters)
+        protected override void OnSetDimensions(ISldWorks app, IModelDoc2 model, IFeature feature, MacroFeatureRebuildResult rebuildResult, DimensionDataCollection dims, RoundStockFeatureParameters parameters)
         {
             var stockModel = ServicesContainer.Instance.GetService<RoundStockModel>();
 
@@ -135,35 +134,34 @@ namespace CodeStack.Community.StockFit.Sw
             var startPt = new Point(cylParams.Origin.ToArray());
             var heightDir = new Vector(cylParams.Axis.ToArray());
             var endPt = startPt.Move(heightDir, cylParams.Height);
-            
-            Vector diamDir = null;
+
+            Vector extrMatDir = null;
 
             var yVec = new Vector(0, 1, 0);
             if (heightDir.IsSame(yVec))
             {
-                diamDir = new Vector(1, 0, 0);
+                extrMatDir = new Vector(1, 0, 0);
             }
             else
             {
-                diamDir = yVec.Cross(heightDir);
+                extrMatDir = yVec.Cross(heightDir);
             }
 
-            var startExtraDiamPt = endPt.Move(diamDir, cylParams.Radius - parameters.ExtraRadius);
+            var startExtraDiamPt = endPt.Move(extrMatDir, cylParams.Radius - parameters.ExtraRadius);
 
-            var diamExtVec = diamDir.Cross(heightDir);
+            var radDir = extrMatDir.Cross(heightDir);
 
-            dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.SetDirection(endPt, diamDir, cylParams.Radius, diamExtVec);
+            dims[(int)RoundStockFeatureDimensions_e.Radius].SetDirection(endPt, radDir);
             dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
             dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.ReadOnly = true;
 
-            dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.SetDirection(startPt, heightDir, cylParams.Height);
+            dims[(int)RoundStockFeatureDimensions_e.Height].SetDirection(startPt, heightDir);
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.ReadOnly = true;
 
-            dims[(int)RoundStockFeatureDimensions_e.ExtraRadius].Dimension.SetDirection(
-                startExtraDiamPt, diamDir, parameters.ExtraRadius);
+            dims[(int)RoundStockFeatureDimensions_e.ExtraRadius].SetDirection(startExtraDiamPt, extrMatDir);
         }
-
+        
         private CylinderParams GetCylinderParams(IModelDoc2 model,
             RoundStockFeatureParameters parameters)
         {
