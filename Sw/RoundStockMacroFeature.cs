@@ -125,7 +125,8 @@ namespace CodeStack.Community.StockFit.Sw
             }
         }
 
-        protected override void OnSetDimensions(ISldWorks app, IModelDoc2 model, IFeature feature, MacroFeatureRebuildResult rebuildResult, DimensionDataCollection dims, RoundStockFeatureParameters parameters)
+        protected override void OnSetDimensions(ISldWorks app, IModelDoc2 model, IFeature feature, 
+            MacroFeatureRebuildResult rebuildResult, DimensionDataCollection dims, RoundStockFeatureParameters parameters)
         {
             var stockModel = ServicesContainer.Instance.GetService<RoundStockModel>();
 
@@ -148,18 +149,16 @@ namespace CodeStack.Community.StockFit.Sw
             }
 
             var startExtraDiamPt = endPt.Move(extrMatDir, cylParams.Radius - parameters.ExtraRadius);
-
-            var radDir = extrMatDir.Cross(heightDir);
-
-            dims[(int)RoundStockFeatureDimensions_e.Radius].SetDirection(endPt, radDir);
+            
+            dims[(int)RoundStockFeatureDimensions_e.Radius].SetOrientation(endPt, heightDir);
             dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
             dims[(int)RoundStockFeatureDimensions_e.Radius].Dimension.ReadOnly = true;
 
-            dims[(int)RoundStockFeatureDimensions_e.Height].SetDirection(startPt, heightDir);
+            dims[(int)RoundStockFeatureDimensions_e.Height].SetOrientation(startPt, heightDir);
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.DrivenState = (int)swDimensionDrivenState_e.swDimensionDriven;
             dims[(int)RoundStockFeatureDimensions_e.Height].Dimension.ReadOnly = true;
 
-            dims[(int)RoundStockFeatureDimensions_e.ExtraRadius].SetDirection(startExtraDiamPt, extrMatDir);
+            dims[(int)RoundStockFeatureDimensions_e.ExtraRadius].SetOrientation(startExtraDiamPt, extrMatDir);
         }
         
         private CylinderParams GetCylinderParams(IModelDoc2 model,
