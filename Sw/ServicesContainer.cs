@@ -41,7 +41,7 @@ namespace CodeStack.Community.StockFit.Sw
     /// </summary>
     public class ServicesContainer
     {
-        private UnityContainer m_Container;
+        private readonly UnityContainer m_Container;
 
         public static ServicesContainer Instance
         {

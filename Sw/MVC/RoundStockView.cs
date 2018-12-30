@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text;
 using CodeStack.SwEx.PMPage.Controls;
 using System.Diagnostics;
+using CodeStack.SwEx.AddIn.Attributes;
 
 namespace CodeStack.Community.StockFit.Sw.MVC
 {
@@ -203,19 +204,19 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
     public enum StockSteps_e
     {
-        [ComboBoxItemText("0")]
+        [SwEx.Common.Attributes.Title("0")]
         Step0, //0
 
-        [ComboBoxItemText("1/16")]
+        [SwEx.Common.Attributes.Title("1/16")]
         Step1_16,//0.0015875
 
-        [ComboBoxItemText("1/8")]
+        [SwEx.Common.Attributes.Title("1/8")]
         Step1_8//0.003175
     }
 
     public class RoundStockView : PropertyManagerPageEx<RoundStockViewHandler, RoundStockViewModel>
     {
-        public RoundStockView(RoundStockViewModel model, ISldWorks app) : base(model, app)
+        public RoundStockView(ISldWorks app) : base(app)
         {
         }
     }

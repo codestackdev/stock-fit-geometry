@@ -25,7 +25,7 @@ using Xarial.AppLaunchKit.Base.Services;
 
 namespace CodeStack.Community.StockFit.Sw.MVC
 {
-    public class RoundStockController
+    public class RoundStockController : IDisposable
     {
         private RoundStockView m_ActivePage;
 
@@ -58,6 +58,12 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_App = app;
             m_Model = model;
             m_UserSetts = opts;
+
+            m_ActivePage = new RoundStockView(m_App);
+
+            m_ActivePage.Handler.DataChanged += OnDataChanged;
+            m_ActivePage.Handler.Closing += OnPageClosing;
+            m_ActivePage.Handler.Closed += OnClosed;
         }
 
         public void ShowPage(RoundStockFeatureParameters parameters, IPartDoc part, IFeature editingFeature, IMacroFeatureData featData)
@@ -67,22 +73,9 @@ namespace CodeStack.Community.StockFit.Sw.MVC
             m_EditingFeature = editingFeature;
             m_EditingFeatureData = featData;
 
-            if (m_ActivePage != null)
-            {
-                m_ActivePage.Handler.DataChanged -= OnDataChanged;
-                m_ActivePage.Handler.Closing -= OnPageClosing;
-                m_ActivePage.Handler.Closed -= OnClosed;
-            }
-
             m_CurrentViewModel = RoundStockViewModel.FromParameters(parameters);
-
-            m_ActivePage = new RoundStockView(m_CurrentViewModel, m_App);
-
-            m_ActivePage.Handler.DataChanged += OnDataChanged;
-            m_ActivePage.Handler.Closing += OnPageClosing;
-            m_ActivePage.Handler.Closed += OnClosed;
-
-            m_ActivePage.Show();
+            
+            m_ActivePage.Show(m_CurrentViewModel);
             
             m_Model.ShowPreview(part, parameters.Direction, parameters.ConcenticWithCylindricalFace,
                 parameters.StockStep, parameters.ExtraRadius);
@@ -138,7 +131,6 @@ namespace CodeStack.Community.StockFit.Sw.MVC
                     m_CurrentPart, m_CurrentParameters.Direction);
 
                 m_UserSetts.StoreSettings(m_CurrentParameters, nameof(RoundStockFeatureParameters));
-                //m_OptsStore.Save(m_CurrentParameters);
             }
 
             if (m_EditingFeature != null)
@@ -153,6 +145,16 @@ namespace CodeStack.Community.StockFit.Sw.MVC
 
             m_EditingFeature = null;
             m_CurrentPart = null;
+        }
+
+        public void Dispose()
+        {
+            if (m_ActivePage != null)
+            {
+                m_ActivePage.Handler.DataChanged -= OnDataChanged;
+                m_ActivePage.Handler.Closing -= OnPageClosing;
+                m_ActivePage.Handler.Closed -= OnClosed;
+            }
         }
     }
 }
