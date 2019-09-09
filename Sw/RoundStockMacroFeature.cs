@@ -179,14 +179,14 @@ namespace CodeStack.Community.StockFit.Sw
                 prpMgr.Set2(prpName, prpVal);
             });
 
-            var metersToInch = new Func<double, double>((m) => System.Math.Round(m * 39.37007874, 3));
+            var metersToMm = new Func<double, double>((m) => System.Math.Round(m * 1000, 3));
 
             var model = modelDoc as IModelDoc2;
             var activeConf = model.ConfigurationManager.ActiveConfiguration.Name;
 
             setPrpValFunc.Invoke(model, "StockVisible", Convert.ToInt32(param.CreateSolidBody).ToString(), activeConf);
-            setPrpValFunc.Invoke(model, "StockDiameter", metersToInch(cylParams.Radius * 2).ToString(), activeConf);
-            setPrpValFunc.Invoke(model, "StockLength", metersToInch(cylParams.Height).ToString(), activeConf);
+            setPrpValFunc.Invoke(model, "StockDiameter", metersToMm(cylParams.Radius * 2).ToString(), activeConf);
+            setPrpValFunc.Invoke(model, "StockLength", metersToMm(cylParams.Height).ToString(), activeConf);
         }
     }
 }
