@@ -17,6 +17,8 @@ using SolidWorks.Interop.swconst;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Xarial.AppLaunchKit.Base.Services;
 
@@ -30,6 +32,26 @@ namespace CodeStack.Community.StockFit.Sw
     [ProgId(ID)]
     public class SwStockFitGeometryAddIn : SwAddInEx
     {
+        static SwStockFitGeometryAddIn()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+        }
+
+        private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var assmName = new AssemblyName(args.Name);
+            
+            if (assmName.Name == "Newtonsoft.Json")
+            {
+                var assmPath = Path.Combine(Path.GetDirectoryName(typeof(SwStockFitGeometryAddIn).Assembly.Location),
+                    "Newtonsoft.Json.dll");
+
+                return Assembly.LoadFile(assmPath);
+            }
+
+            return null;
+        }
+
         public const string ID = "CodeStack.StockFitGeometry";
         
         [SwEx.Common.Attributes.Title("Stock Master")]
